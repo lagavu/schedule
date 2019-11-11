@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+    <!-- Fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+    <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <hr>
+    <h2>Расписание работника компании</h2>
+    <hr>
+    <h5>В вашей компании работает  сотрудников</h5>
+    <hr>
+
+    <div class="alert  alert-danger">
+        <ul>
+            <li>1</li>
+        </ul>
+    </div>
+    <br>
+
+    <br>
+    {{ form_start(form) }}
+        <div class="my-custom-class-for-errors">
+            {{ form_errors(form) }}
+        </div>
+        <div class="row  align-items-end">
+            <div class="form-group col">
+                {{ form_row(form.userId, {'label': 'User ID'}) }}
+            </div>
+            <div class="form-group col" id="rangestart">
+                {{ form_row(form.start_date, {'label': 'Дата от'}) }}
+            </div>
+            <div class="form-group col" id="rangeend">
+                {{ form_row(form.end_date, {'label': 'Дата до'}) }}
+            </div>
+            <div class="form-group col">
+                <button type="submit" class="btn btn-success btn-submit">Расчитать</button>
+            </div>
+        </div>
+
+    {{ form_end(form) }}
+    <br>
+    <br>
+    <hr>
+
+    <br>
+
+    <div class="row">
+        <div class="col-6">
+            <h5 class="font-weight-bolder">Информация о работнике:</h5>
+            <table class="table mt-5">
+                <thead>
+                </thead>
+                <tbody>
+                <tr>
+                    <td scope="row">IdUser</td>
+                    <td>11</td>
+                </tr>
+                <tr>
+                    <td scope="row">График работы:</td>
+                    <td>c 11 <br>
+                        c 11
+                    </td>
+                </tr>
+                <tr>
+                    <td scope="row">Отпуск:</td>
+                    <td>
+
+                        У данного сотрудника отпуск не указан
+
+                        от 11 до 11 <br>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <table class="table mt-5">
+                <thead>
+                <tr>
+                    <th scope="col">Праздник компании</th>
+                    <th scope="col">Начало</th>
+                    <th scope="col">Окончание</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr>
+                    <td>11</td>
+                    <td>11</td>
+                    <td>11</td>
+                </tr>
+
+                </tbody>
+            </table>
+            <br>
+            <table class="table mt-5">
+                <thead>
+                <tr>
+                    <th scope="col">Праздники России за 2019</th>
+                    <th scope="col">Дата</th>
+                </tr>
+
+                <tr>
+
+                    <td> 11 </td>
+                    <td> 11 </td>
+
+                </tr>
+
+                </thead>
+            </table>
+        </div>
+        <div class="col-6">
+            <h5 class="font-weight-bolder">JSON</h5>
+            <p>Выходные дни не учитываются</p>
+            <pre>
+
+                 </pre>
+        </div>
+
+    </div>
+
+</div>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+</body>
+</html>

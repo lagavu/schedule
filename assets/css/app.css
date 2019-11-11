@@ -1,0 +1,13 @@
+@import "~bootstrap/dist/css/bootstrap.css";
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
