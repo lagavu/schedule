@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Repository;
+namespace App\Model\Holiday\Entity\Holiday;
 
-use App\Entity\Holiday;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+
+use App\Model\EntityNotFoundException;
+use App\Model\Work\Entity\Projects\Task\Id;
+use App\Model\Work\Entity\Projects\Task\Task;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @method Holiday|null find($id, $lockMode = null, $lockVersion = null)
@@ -12,11 +14,26 @@ use Doctrine\Common\Persistence\ManagerRegistry;
  * @method Holiday[]    findAll()
  * @method Holiday[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class HolidayRepository extends ServiceEntityRepository
+class HolidayRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $repo;
+    private $connection;
+    private $em;
+
+    public function __construct(EntityManagerInterface $em)
     {
-        parent::__construct($registry, Holiday::class);
+        $this->repo = $em->getRepository(Holiday::class);
+        $this->connection = $em->getConnection();
+        $this->em = $em;
+    }
+
+    public function get(Id $id): Holiday
+    {
+        /** @var Task $task */
+        if (!$task = $this->repo->find($id->getValue())) {
+            throw new EntityNotFoundException('Task is not found.');
+        }
+        return $task;
     }
 
     // /**

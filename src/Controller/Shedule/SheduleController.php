@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Shedule;
 
-use App\Entity\User;
 use App\Form\SheduleType;
+use App\Model\User\Entity\User\User;
 use App\ReadModel\Shedule\SheduleFetcher;
 use App\ReadModel\Shedule\Query;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,7 +52,7 @@ class SheduleController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
-    public function show(Request $request)
+    public function shedule(Request $request)
     {
 
         $user = new User();

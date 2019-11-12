@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Entity;
+namespace App\Model\User\Entity\User;
 
+use App\Model\Holiday\Entity\Holiday\Holiday;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="App\Model\User\Entity\User\UserRepository")
  */
 class User
 {
