@@ -5,7 +5,8 @@ namespace App\Model\Party\Entity\Party;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Model\Party\Entity\Party\PartyRepository")
+ * @ORM\Entity
+ * @ORM\Table(name="party_parties")
  */
 class Party
 {

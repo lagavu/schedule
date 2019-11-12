@@ -2,10 +2,12 @@
 
 namespace App\Model\Holiday\Entity\Holiday;
 
+use App\Model\User\Entity\User\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Model\Holiday\Entity\Holiday\HolidayRepository")
+ * @ORM\Entity
+ * @ORM\Table(name="holiday_holidays")
  */
 class Holiday
 {
@@ -32,8 +34,9 @@ class Holiday
     private $holidays_before;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="holiday")
-     * @ORM\JoinColumn(nullable=false)
+     * @var User
+     * @ORM\ManyToOne(targetEntity="App\Model\User\Entity\User\User", inversedBy="holiday")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $user;
 

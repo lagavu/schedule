@@ -4,8 +4,8 @@ namespace App\Controller\Shedule;
 
 use App\Form\SheduleType;
 use App\Model\User\Entity\User\User;
-use App\ReadModel\Shedule\SheduleFetcher;
-use App\ReadModel\Shedule\Query;
+use App\ReadModel\User\SheduleFetcher;
+use App\ReadModel\User\Shedule;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -59,9 +59,9 @@ class SheduleController extends AbstractController
 
         $now = new \DateTimeImmutable();
 
-        $query = Query\Query::fromDate($now);
+        $query = Shedule\Query::fromDate($now);
 
-        $form = $this->createForm(Query\Form::class);
+        $form = $this->createForm(Shedule\Form::class);
 
         return $this->render('shedule/index.html.twig', [
             'form' => $form->createView(),

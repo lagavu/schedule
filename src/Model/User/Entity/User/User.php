@@ -8,7 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Model\User\Entity\User\UserRepository")
+ * @ORM\Entity
+ * @ORM\Table(name="user_users")
  */
 class User
 {
@@ -20,7 +21,8 @@ class User
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Holiday", mappedBy="user", orphanRemoval=true)
+     * @var ArrayCollection|Holiday[]
+     * @ORM\OneToMany(targetEntity="App\Model\Holiday\Entity\Holiday\Holiday", mappedBy="user", orphanRemoval=true, cascade={"all"})
      */
     private $holiday;
 
