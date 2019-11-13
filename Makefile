@@ -19,7 +19,7 @@ docker-pull:
 docker-build:
 	docker-compose build
 
-shedule-init: shedule-composer-install shedule-assets-install shedule-migrations shedule-fixtures shedule-ready
+shedule-init: shedule-composer-install shedule-assets-install shedule-migrations shedule-ready
 
 shedule-clear:
 	docker run --rm -v ${PWD}/shedule:/app --workdir=/app alpine rm -f .ready

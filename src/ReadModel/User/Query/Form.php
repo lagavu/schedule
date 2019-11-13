@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\ReadModel\User\Shedule;
+namespace App\ReadModel\User\Query;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;

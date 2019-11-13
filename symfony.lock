@@ -99,8 +99,14 @@
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
+    "jenssegers/date": {
+        "version": "v3.5.0"
+    },
     "monolog/monolog": {
         "version": "1.25.1"
+    },
+    "nesbot/carbon": {
+        "version": "2.26.0"
     },
     "nikic/php-parser": {
         "version": "v4.3.0"

@@ -3,10 +3,10 @@
 namespace App\Model\Holiday\Entity\Holiday;
 
 
-use App\Model\EntityNotFoundException;
 use App\Model\Work\Entity\Projects\Task\Id;
 use App\Model\Work\Entity\Projects\Task\Task;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 
 /**
  * @method Holiday|null find($id, $lockMode = null, $lockVersion = null)

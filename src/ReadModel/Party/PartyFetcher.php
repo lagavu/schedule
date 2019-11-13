@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 
 
-namespace App\ReadModel\Holiday;
+namespace App\ReadModel\Party;
 
 
-use App\Model\Holiday\Entity\Holiday\Holiday;
+use App\Model\Party\Entity\Party\Party;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 
-class HolidayFetcher
+class PartyFetcher
 {
 
     private $connection;
@@ -20,23 +20,24 @@ class HolidayFetcher
     public function __construct(Connection $connection, EntityManagerInterface $em)
     {
         $this->connection = $connection;
-        $this->repository = $em->getRepository(Holiday::class);
+        $this->repository = $em->getRepository(Party::class);
     }
 
-    public function holiday(int $id): array
+    public function party(): array
     {
         $stmt = $this->connection->createQueryBuilder()
             ->select(
                 'id',
-                'user_id',
-                'holidays_from',
-                'holidays_before'
+                'name',
+                'party_day_from',
+                'party_day_before',
+                'party_time_from',
+                'party_time_before'
             )
-            ->from('holiday_holidays')
-            ->where('user_id = :id')
-            ->setParameter(':id', $id)
+            ->from('party_parties')
             ->execute();
 
         return $stmt->fetchAll();
     }
+
 }
