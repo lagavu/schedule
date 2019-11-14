@@ -23,7 +23,7 @@ class HolidayFetcher
         $this->repository = $em->getRepository(Holiday::class);
     }
 
-    public function holiday(int $id): array
+    public function holiday($id): array
     {
         $stmt = $this->connection->createQueryBuilder()
             ->select(

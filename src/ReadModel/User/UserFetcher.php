@@ -28,9 +28,10 @@ class UserFetcher
     public function maxHour()
     {
         $stmt = $this->connection->createQueryBuilder()
-           ->select('MAX(morning_work_hours_before) morning_work_hours_before')
+            ->select('MAX(morning_work_hours_before) morning_work_hours_before')
             ->from('user_users')
             ->execute();
         return $stmt->fetchAll();
     }
+
 }

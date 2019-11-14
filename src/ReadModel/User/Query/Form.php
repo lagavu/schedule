@@ -29,8 +29,7 @@ class Form extends AbstractType
                 'required' => true,
                 'widget' => 'single_text',
                 'html5' => false,
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -39,6 +38,7 @@ class Form extends AbstractType
             'data_class' => Query::class,
             'method' => 'GET',
             'csrf_protection' => false,
+            'action' => 'shedule'
         ]);
     }
 }

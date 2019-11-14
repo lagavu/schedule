@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Model\User\Entity\User;
 
-use App\Model\EntityNotFoundException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 
 class UserRepository
 {
@@ -23,6 +23,11 @@ class UserRepository
 
     public function findUser($id)
     {
+        if ($this->repo->findOneBy(['id' => $id]) === null)
+        {
+            throw new EntityNotFoundException('User not found.');
+        }
         return $this->repo->findOneBy(['id' => $id]);
     }
+
 }

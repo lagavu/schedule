@@ -14,11 +14,12 @@ class Date
     {
         $this->party = $party->party();
     }
-
     public function count(): int
     {
         return count($this->party);
     }
+
+
 
     public function check(): bool
     {

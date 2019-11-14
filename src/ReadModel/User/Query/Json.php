@@ -7,35 +7,48 @@ namespace App\ReadModel\User\Query;
 
 class Json
 {
-
     private $party;
     private $user;
+    private $parties;
+    private $userFetcher;
 
-    public function __construct($party, $user)
+    public function __construct($party, $user, $parties, $userFetcher)
     {
         $this->party = $party;
         $this->user = $user;
+        $this->parties = $parties;
+        $this->userFetcher = $userFetcher;
     }
-    // Проверка даты в JSON
+
     public function check($s)
     {
-        dd($this->party->party());
+        foreach ($this->parties->all() as $party) {
+            $res = $this->party->count();
+            {
+                for ($i=0; $i < $res; $i++)
+                    $new = [
+                        $party->getPartyDayFrom()->Format('Y-m-d'),
+                        $party->getPartyTimeFrom()->Format('H:i:s')
+                    ];
+            }
 
-        $allParties = $this->allParties();
-        foreach ($allParties as $party) {
-            $dateTimeParties = Arr::only($party, ['party_day_from', 'party_time_from']);
-            if ($s === $dateTimeParties['party_day_from']) {
-                $s = $dateTimeParties;
+            if ($s === $new['0']) {
+                $s = $new;
             }
         }
         return $s;
     }
-    // Поления первых дат праздников компании
+
     public function party($s)
     {
-        $allParties = $this->allParties();
-        $allDate = Arr::pluck($allParties, 'party_day_from');
-        if (is_array($s) && in_array($s['party_day_from'], $allDate))
+        $res = $this->party->count();
+
+        for ($i=0; $i < $res; $i++)
+        {
+            $allDate[]=$this->parties->all()[$i];
+        }
+
+        if (is_array($s) && in_array($s['0'], $allDate))
         {
             return $s['party_day_from'];
         } else {
@@ -43,32 +56,31 @@ class Json
         }
     }
 
-    // Время для JSON с учетом праздников
     public function time($s, $range)
     {
-        if (!is_array($s))
+        if (!is_array($range))
         {
             return $range;
         }
         else {
             foreach ($range as $val)
             {
-                if ($s['party_time_from'] < $val['end']
-                    && $s['party_time_from'] > $val['start']
-                    && $this->maxMorningHour() > $s['party_time_from'])
+                if ($s['1'] < $val['end']
+                    && $s['1'] > $val['start']
+                    && $this->userFetcher->maxHour()[0]['morning_work_hours_before'] > $s['1'])
                 {
                     $range = [
-                        ['start' => $this->morning_work_hours_from, 'end' => $s['party_time_from']],
+                        ['start' => $this->user->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $s['1']],
                     ];
                     return $range;
                     break;
                 }
-                elseif ($s['party_time_from'] < $range[1]['end']
-                    && $s['party_time_from'] > $range[1]['start'])
+                elseif ($s['1'] < $range[1]['end']
+                    && $s['1'] > $range[1]['start'])
                 {
                     $range = [
-                        ['start' => $this->morning_work_hours_from, 'end' => $this->morning_work_hours_before],
-                        ['start' => $this->afternoon_work_hours_from, 'end' => $s['party_time_from']]
+                        ['start' => $this->user->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $this->user->getMorningWorkHoursBefore()->Format('H:i:s')],
+                        ['start' => $this->user->getAfternoonWorkHoursFrom()->Format('H:i:s'), 'end' => $s['1']]
                     ];
                     return $range;
                     break;
@@ -77,14 +89,14 @@ class Json
             }
         }
     }
-    // Получить JSON
+
     public function getJSON($shedule)
     {
-
-        dd($this->user);
         $range = [
-            ['start' => $this->morning_work_hours_from, 'end' => $this->morning_work_hours_before] ,
-            ['start' => $this->afternoon_work_hours_from, 'end' => $this->afternoon_work_hours_before]
+            ['start' => $this->user->getMorningWorkHoursFrom()->Format('H:i:s'),
+             'end' => $this->user->getMorningWorkHoursBefore()->Format('H:i:s')] ,
+            ['start' => $this->user->getAfternoonWorkHoursFrom()->Format('H:i:s'),
+             'end' => $this->user->getAfternoonWorkHoursBefore()->Format('H:i:s')]
         ];
         $data = array_map(function($s) use ($range){
             return [

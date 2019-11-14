@@ -7,9 +7,6 @@
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
     {% endblock %}
-    <!-- Fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
     <link href="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.css" rel="stylesheet" type="text/css" />
     <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
     <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.js"></script>
@@ -17,18 +14,9 @@
 <body>
 <div class="container">
     <hr>
-    <h2>Расписание работника компании</h2>
-    <hr>
-    <h5>В вашей компании работает  сотрудников</h5>
-    <hr>
-
-    <div class="alert  alert-danger">
-        <ul>
-            <li>1</li>
-        </ul>
-    </div>
+        <h2>Расписание работника компании</h2>
     <br>
-
+    <hr>
     <br>
     {{ form_start(form) }}
         <div class="my-custom-class-for-errors">
@@ -46,16 +34,14 @@
             </div>
             <div class="form-group col">
                 <button type="submit" class="btn btn-success btn-submit">Расчитать</button>
+
             </div>
         </div>
-
     {{ form_end(form) }}
     <br>
     <br>
     <hr>
-
     <br>
-
     <div class="row">
         <div class="col-6">
             <h5 class="font-weight-bolder">Информация о работнике:</h5>
@@ -63,27 +49,35 @@
                 <thead>
                 </thead>
                 <tbody>
-                <tr>
-                    <td scope="row">IdUser</td>
-                    <td>11</td>
-                </tr>
-                <tr>
-                    <td scope="row">График работы:</td>
-                    <td>c 11 <br>
-                        c 11
-                    </td>
-                </tr>
-                <tr>
-                    <td scope="row">Отпуск:</td>
+                {% if user is defined %}
+                    <tr>
+                        <td scope="row">IdUser</td>
+                        <td>{{ user.id }}</td>
+                    </tr>
+                    <tr>
+                        <td scope="row">График работы:</td>
+                        <td>c {{ user.morningworkhoursfrom|date('H:i:s') }} до {{ user.morningworkhoursbefore|date('H:i:s') }} <br>
+                            c {{ user.afternoonworkhoursfrom|date('H:i:s') }} до {{ user.afternoonworkhoursbefore|date('H:i:s') }}
+                        </td>
+                    </tr>
+                <td scope="row">Отпуск:</td>
+                {% if holidays  is defined %}
+                        {% for holiday in holidays %}
+                            <tr>
+                                <td>
+                                    от {{ holiday.holidaysfrom|date('Y.m.d') }} до {{ holiday.holidaysbefore|date('Y.m.d') }} <br>
+                                    <br>
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
                     <td>
-
                         У данного сотрудника отпуск не указан
-
-                        от 11 до 11 <br>
-
                     </td>
-                </tr>
+                    {% endif %}
                 </tbody>
+                {% endif %}
             </table>
             <br>
             <table class="table mt-5">
@@ -95,13 +89,15 @@
                 </tr>
                 </thead>
                 <tbody>
-
-                <tr>
-                    <td>11</td>
-                    <td>11</td>
-                    <td>11</td>
-                </tr>
-
+                {% if parties is defined %}
+                    {% for party in parties %}
+                        <tr>
+                            <td>{{ party.name }}</td>
+                            <td>{{ party.partydayfrom|date('Y.m.d') }} - {{ party.partytimefrom|date('H:i:s') }}</td>
+                            <td>{{ party.partydaybefore|date('Y.m.d') }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
                 </tbody>
             </table>
             <br>
@@ -111,14 +107,14 @@
                     <th scope="col">Праздники России за 2019</th>
                     <th scope="col">Дата</th>
                 </tr>
-
-                <tr>
-
-                    <td> 11 </td>
-                    <td> 11 </td>
-
-                </tr>
-
+                {% for item in calendar %}
+                    {% if item.date|date('Y') == year %}
+                        <tr>
+                            <td> {{ item.date|date('Y.m.d') }} </td>
+                            <td> {{ item.name_holiday }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
                 </thead>
             </table>
         </div>
@@ -126,15 +122,13 @@
             <h5 class="font-weight-bolder">JSON</h5>
             <p>Выходные дни не учитываются</p>
             <pre>
-
-                 </pre>
+                {% if json is defined %}
+                    {{ json }}
+                {% endif %}
+             </pre>
         </div>
-
     </div>
-
 </div>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.js"></script>
 {% block javascripts %}
     {{ encore_entry_script_tags('app') }}
 {% endblock %}

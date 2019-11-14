@@ -2,19 +2,21 @@
 
 namespace App\Controller\Shedule;
 
+use App\Model\Holiday\Entity\Holiday\HolidayRepository;
 use App\Model\Party\Entity\Party\Date;
-use App\Model\User\Entity\User\User;
+use App\Model\Party\Entity\Party\PartyRepository;
 use App\Model\User\Entity\User\UserRepository;
 use App\Model\User\Entity\User\Vacation;
-use App\ReadModel\Holiday\Filter\Filter;
 use App\ReadModel\Holiday\HolidayFetcher;
 use App\ReadModel\Party\PartyFetcher;
+use App\ReadModel\User\Query\Form;
 use App\ReadModel\User\Query\Json;
 use App\ReadModel\User\Query\Query;
 use App\ReadModel\User\UserFetcher;
 use App\Service\GoogleСalendar;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class SheduleController extends AbstractController
@@ -22,37 +24,17 @@ class SheduleController extends AbstractController
     /**
      * @Route("/", name="")
      */
-    public function index()
+    public function index(GoogleСalendar $сalendar): Response
     {
-        return $this->render('shedule/index.html.twig', [
-            'controller_name' => 'SheduleController',
-        ]);
-    }
-/*
-    public function show(Project $project, Request $request, CalendarFetcher $calendar): Response
-    {
-        $this->denyAccessUnlessGranted(ProjectAccess::VIEW, $project);
-
-        $now = new \DateTimeImmutable();
-
-        $query = Query\Query::fromDate($now)->forProject($project->getId()->getValue());
-
-        $form = $this->createForm(Query\Form::class, $query);
-        $form->handleRequest($request);
-
-        $result = $calendar->byMonth($query);
+        $form = $this->createForm(Form::class);
 
         return $this->render('shedule/index.html.twig', [
-            'project' => $project,
-            'dates' => iterator_to_array(new \DatePeriod($result->start, new \DateInterval('P1D'), $result->end)),
-            'now' => $now,
-            'result' => $result,
-            'next' => $result->month->modify('+1 month'),
-            'prev' => $result->month->modify('-1 month'),
+            'year' => date('Y'),
+            'calendar' => $сalendar->holiday(),
             'form' => $form->createView(),
         ]);
     }
-*/
+
     /**
      * @Route("/shedule", name="shedule")
      * @param Request $request
@@ -63,29 +45,34 @@ class SheduleController extends AbstractController
         Request $request,
         HolidayFetcher $holiday,
         PartyFetcher $party,
+        UserFetcher $userFetcher,
         GoogleСalendar $сalendar,
-        UserFetcher $fetcher
-
-        )
+        UserRepository $userRepository,
+        HolidayRepository $holidayRepository,
+        PartyRepository $parties
+        ): Response
     {
         $query = $request->query->get('form');
-        // $date = Query\Query::date($query['start_date'], $query['end_date']);
-        $id = 5;
-        $vacation = new Vacation($id, $holiday);
+        $id = $query['userId'];
+        $user = $userRepository->findUser($id);
+        $getHoliday = $holidayRepository->all($id);
+
         $party = new Date($party);
-        $user = new UserRepository();
-        $user = $user->findUser($id);
+        $vacation = new Vacation($id, $holiday);
         $date = new Query ($query['userId'], $query['start_date'], $query['end_date'], $vacation, $сalendar, $party);
+        $json = new Json($party, $user, $parties, $userFetcher);
+        $getJson = $json->getJSON($date->shedule());
 
-
-        $json = new Json($party, $user);
-
-
-        dd($json->getJSON($date->shedule()));
-
+        $form = $this->createForm(Form::class);
 
         return $this->render('shedule/index.html.twig', [
-            'form' => $form->createView(),
+            'json' => $getJson,
+            'user' => $user,
+            'holidays' => $getHoliday,
+            'parties' => $parties->all(),
+            'year' => date('Y'),
+            'calendar' => $сalendar->holiday(),
+            'form' => $form->createView()
 
         ]);
     }

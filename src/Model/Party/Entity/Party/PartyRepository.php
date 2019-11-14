@@ -1,49 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model\Party\Entity\Party;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * @method Party|null find($id, $lockMode = null, $lockVersion = null)
- * @method Party|null findOneBy(array $criteria, array $orderBy = null)
- * @method Party[]    findAll()
- * @method Party[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class PartyRepository extends ServiceEntityRepository
+class PartyRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $em;
+    /**
+     * @var \Doctrine\ORM\EntityRepository
+     */
+    private $repo;
+
+    public function __construct(EntityManagerInterface $em)
     {
-        parent::__construct($registry, Party::class);
+        $this->em = $em;
+        $this->repo = $em->getRepository(Party::class);
     }
 
-    // /**
-    //  * @return Party[] Returns an array of Party objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function all()
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->repo->findAll();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Party
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

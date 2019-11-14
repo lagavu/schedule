@@ -27,41 +27,13 @@ class HolidayRepository
         $this->em = $em;
     }
 
-    public function get(Id $id): Holiday
+    public function findHoliday($id)
     {
-        /** @var Task $task */
-        if (!$task = $this->repo->find($id->getValue())) {
-            throw new EntityNotFoundException('Task is not found.');
-        }
-        return $task;
+        return $this->repo->findOneBy(['user_id' => $id]);
     }
 
-    // /**
-    //  * @return Holiday[] Returns an array of Holiday objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function all($id)
     {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->repo->findAll(['user_id' => $id]);
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Holiday
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
