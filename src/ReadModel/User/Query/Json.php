@@ -9,10 +9,12 @@ class Json
 {
 
     private $party;
+    private $user;
 
-    public function __construct($party)
+    public function __construct($party, $user)
     {
         $this->party = $party;
+        $this->user = $user;
     }
     // Проверка даты в JSON
     public function check($s)
@@ -78,6 +80,8 @@ class Json
     // Получить JSON
     public function getJSON($shedule)
     {
+
+        dd($this->user);
         $range = [
             ['start' => $this->morning_work_hours_from, 'end' => $this->morning_work_hours_before] ,
             ['start' => $this->afternoon_work_hours_from, 'end' => $this->afternoon_work_hours_before]

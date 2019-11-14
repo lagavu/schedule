@@ -134,4 +134,10 @@ class User
 
         return $this;
     }
+
+    public function test()
+    {
+
+        return dd(33);
+    }
 }

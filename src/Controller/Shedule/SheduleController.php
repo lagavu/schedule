@@ -4,6 +4,7 @@ namespace App\Controller\Shedule;
 
 use App\Model\Party\Entity\Party\Date;
 use App\Model\User\Entity\User\User;
+use App\Model\User\Entity\User\UserRepository;
 use App\Model\User\Entity\User\Vacation;
 use App\ReadModel\Holiday\Filter\Filter;
 use App\ReadModel\Holiday\HolidayFetcher;
@@ -72,8 +73,8 @@ class SheduleController extends AbstractController
         $id = 5;
         $vacation = new Vacation($id, $holiday);
         $party = new Date($party);
-        $user = new User();
-
+        $user = new UserRepository();
+        $user = $user->findUser($id);
         $date = new Query ($query['userId'], $query['start_date'], $query['end_date'], $vacation, $сalendar, $party);
 
 
@@ -83,24 +84,6 @@ class SheduleController extends AbstractController
         dd($json->getJSON($date->shedule()));
 
 
-
-
-        $filter = new Filter();
-/*
-
-        "start_date" => "January 1, 2019"
-      "end_date" => "January 31, 2019"
-
-*/
-        $result = 1;
-
-        $now = new \DateTimeImmutable();
-
-
-
-
-
-        dd($request);
         return $this->render('shedule/index.html.twig', [
             'form' => $form->createView(),
 

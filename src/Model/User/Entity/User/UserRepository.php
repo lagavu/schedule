@@ -1,49 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model\User\Entity\User;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use App\Model\EntityNotFoundException;
+use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * @method User|null find($id, $lockMode = null, $lockVersion = null)
- * @method User|null findOneBy(array $criteria, array $orderBy = null)
- * @method User[]    findAll()
- * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class UserRepository extends ServiceEntityRepository
+class UserRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $em;
+    /**
+     * @var \Doctrine\ORM\EntityRepository
+     */
+    private $repo;
+
+    public function __construct(EntityManagerInterface $em)
     {
-        parent::__construct($registry, User::class);
+        $this->em = $em;
+        $this->repo = $em->getRepository(User::class);
     }
 
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findUser($id)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->repo->findOneBy(['id' => $id]);
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
