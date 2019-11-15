@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model\Party\Entity\Party;
+namespace App\Model\Party;
 
 use Carbon\Carbon;
 

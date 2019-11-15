@@ -22,18 +22,18 @@ doctrine:
             User:
                 is_bundle: false
                 type: annotation
-                dir: '%kernel.project_dir%/src/Model/User/Entity'
-                prefix: 'App\Model\User\Entity'
+                dir: '%kernel.project_dir%/src/Model/User'
+                prefix: 'App\Model\User'
                 alias: User
             Holiday:
                 is_bundle: false
                 type: annotation
-                dir: '%kernel.project_dir%/src/Model/Holiday/Entity'
-                prefix: 'App\Model\Holiday\Entity'
+                dir: '%kernel.project_dir%/src/Model/Holiday'
+                prefix: 'App\Model\Holiday'
                 alias: Holiday
             Party:
                 is_bundle: false
                 type: annotation
-                dir: '%kernel.project_dir%/src/Model/Party/Entity'
-                prefix: 'App\Model\Party\Entity'
+                dir: '%kernel.project_dir%/src/Model/Party'
+                prefix: 'App\Model\Party'
                 alias: Party

@@ -2,27 +2,30 @@
 
 declare(strict_types=1);
 
+namespace App\Repository;
 
-
-namespace App\ReadModel\Party;
-
-
-use App\Model\Party\Entity\Party\Party;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
-class PartyFetcher
+class PartyRepository
 {
+    private $em;
+    /**
+     * @var EntityRepository
+     */
+    private $repo;
 
-    private $connection;
-    private $repository;
-
-    public function __construct(Connection $connection, EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em)
     {
-        $this->connection = $connection;
-        $this->repository = $em->getRepository(Party::class);
+        $this->em = $em;
+        $this->repo = $em->getRepository(Party::class);
     }
 
+    public function all()
+    {
+        return $this->repo->findAll();
+    }
+/*
     public function party(): array
     {
         $stmt = $this->connection->createQueryBuilder()
@@ -39,5 +42,5 @@ class PartyFetcher
 
         return $stmt->fetchAll();
     }
-
+*/
 }

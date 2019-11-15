@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\RemoteService;
 
-class GoogleСalendar
+class GoogleCalendar
 {
-    private const GOOGLE_СALENDAR_API = 'https://www.googleapis.com/calendar/v3/calendars/russian__ru%40holiday.calendar.google.com/events?key=AIzaSyC8khrJO57yl4szjLOuyQrlW7R_CKgwaH0';
+    private const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3/calendars/russian__ru%40holiday.calendar.google.com/events?key=AIzaSyC8khrJO57yl4szjLOuyQrlW7R_CKgwaH0';
 
     public static function calendar(): array
     {
-        return json_decode(file_get_contents(self::GOOGLE_СALENDAR_API), true);
+        return json_decode(file_get_contents(self::GOOGLE_CALENDAR_API), true);
     }
 
     public static function count(): int
     {
-        $count = GoogleСalendar::calendar();
+        $count = GoogleCalendar::calendar();
         return count($count['items']);
     }
 
     public static function date(): array
     {
-        $calendar = GoogleСalendar::calendar();
-        $count = GoogleСalendar::count();
+        $calendar = GoogleCalendar::calendar();
+        $count = GoogleCalendar::count();
 
         for ($i=0; $i < $count; $i++)
         {
@@ -33,8 +33,8 @@ class GoogleСalendar
 
     public static function name(): array
     {
-        $calendar = GoogleСalendar::calendar();
-        $count = GoogleСalendar::count();
+        $calendar = GoogleCalendar::calendar();
+        $count = GoogleCalendar::count();
 
         for ($i=0; $i < $count; $i++)
         {
@@ -45,9 +45,9 @@ class GoogleСalendar
 
     public function holiday(): array
     {
-        $count = GoogleСalendar::count();
-        $date = GoogleСalendar::date();
-        $name = GoogleСalendar::name();
+        $count = GoogleCalendar::count();
+        $date = GoogleCalendar::date();
+        $name = GoogleCalendar::name();
         for ($i = 0; $i < $count; $i++)
         {
             $holiday[] = [
@@ -60,7 +60,7 @@ class GoogleСalendar
 
     public function current(): array
     {
-        $calendar = GoogleСalendar::date();
+        $calendar = GoogleCalendar::date();
         $current = array_filter($calendar, function ($var) {
             return substr($var, 0, 4) === date("Y");
         });

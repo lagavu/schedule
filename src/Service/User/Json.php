@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\ReadModel\User\Query;
+namespace App\Service\User;
 
 
 

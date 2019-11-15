@@ -1,28 +1,34 @@
 <?php
 
-declare(strict_types=1);
+namespace App\Repository;
 
 
-
-namespace App\ReadModel\Holiday;
-
-
-use App\Model\Holiday\Entity\Holiday\Holiday;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 
-class HolidayFetcher
+class HolidayRepository
 {
-
+    private $repo;
     private $connection;
-    private $repository;
+    private $em;
 
-    public function __construct(Connection $connection, EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em)
     {
-        $this->connection = $connection;
-        $this->repository = $em->getRepository(Holiday::class);
+        $this->repo = $em->getRepository(Holiday::class);
+        $this->connection = $em->getConnection();
+        $this->em = $em;
     }
 
+    public function findHoliday(int $id): Holiday
+    {
+        return $this->repo->findOneBy(['user_id' => $id]);
+    }
+
+    public function all($id)
+    {
+        return $this->repo->findAll(['user_id' => $id]);
+    }
+
+    /*
     public function holiday($id): array
     {
         $stmt = $this->connection->createQueryBuilder()
@@ -39,4 +45,5 @@ class HolidayFetcher
 
         return $stmt->fetchAll();
     }
+    */
 }

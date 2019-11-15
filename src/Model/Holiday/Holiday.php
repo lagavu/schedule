@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model\Holiday\Entity\Holiday;
+namespace App\Model\Holiday;
 
-use App\Model\User\Entity\User\User;
+use App\Model\User\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

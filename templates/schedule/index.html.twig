@@ -18,26 +18,27 @@
     <br>
     <hr>
     <br>
-    {{ form_start(form) }}
-        <div class="my-custom-class-for-errors">
-            {{ form_errors(form) }}
-        </div>
+    <form method="get"  action="schedule">
         <div class="row  align-items-end">
             <div class="form-group col">
-                {{ form_row(form.userId, {'label': 'User ID'}) }}
-            </div>
-            <div class="form-group col" id="rangestart">
-                {{ form_row(form.start_date, {'label': 'Дата от'}) }}
-            </div>
-            <div class="form-group col" id="rangeend">
-                {{ form_row(form.end_date, {'label': 'Дата до'}) }}
+                <label>ID user</label>
+
+                <input type="text" name="userId" class="form-control" placeholder="Name" value="" id="userId">
             </div>
             <div class="form-group col">
-                <button type="submit" class="btn btn-success btn-submit">Расчитать</button>
-
+                <label>Дата, от</label>
+                <input type="date" name="startDate" class="form-control" value="" id="startDate">
+            </div>
+            <div class="form-group col">
+                <strong>Дата, до</strong>
+                <input type="date" name="endDate" class="form-control" value="" id="endDate">
+            </div>
+            <div class="form-group col">
+                <button class="btn btn-success btn-submit">Расчитать</button>
             </div>
         </div>
-    {{ form_end(form) }}
+    </form>
+
     <br>
     <br>
     <hr>

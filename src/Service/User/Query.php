@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\ReadModel\User\Query;
+namespace App\Service\User;
 
 use App\Model\Party\Entity\Party\Date;
 use App\Model\User\Entity\User\Vacation;

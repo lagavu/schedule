@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Model\User\Entity\User;
+namespace App\Model\User;
 
-use App\Model\Holiday\Entity\Holiday\Holiday;
+
+use App\Model\Holiday\Holiday;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

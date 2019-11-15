@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Model\User\Entity\User;
+namespace App\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\ORM\EntityRepository;
 
 class UserRepository
 {
     private $em;
     /**
-     * @var \Doctrine\ORM\EntityRepository
+     * @var EntityRepository
      */
     private $repo;
 
@@ -30,4 +31,14 @@ class UserRepository
         return $this->repo->findOneBy(['id' => $id]);
     }
 
+    /*
+    public function maxHour()
+    {
+        $stmt = $this->connection->createQueryBuilder()
+            ->select('MAX(morning_work_hours_before) morning_work_hours_before')
+            ->from('user_users')
+            ->execute();
+        return $stmt->fetchAll();
+    }
+    */
 }
