@@ -1,27 +1,26 @@
 <?php
 
-declare(strict_types=1);
+namespace App\Service\Holiday;
 
-namespace App\Service\User;
-
+use App\Repository\HolidayRepository;
 use Carbon\Carbon;
 
-class Vacation
+class Holiday
 {
     private $id;
-    private $fetcher;
-    private $employee;
+    private $holiday;
+    private $user;
 
-    public function __construct($id, $fetcher)
+    public function __construct($id, HolidayRepository $holiday)
     {
         $this->id = $id;
-        $this->fetcher = $fetcher;
-        $this->employee = $fetcher->holiday($id);
+        $this->holiday = $holiday;
+        $this->user = $holiday->findHoliday($id);
 
     }
     public function count()
     {
-        return count($this->employee);
+        return count($this->user);
     }
 
     public function check()
@@ -31,18 +30,18 @@ class Vacation
 
     public function from(int $i)
     {
-        return $this->employee[$i]['holidays_from'];
+        return $this->user[$i]['holidays_from'];
     }
 
     public function before(int $i)
     {
-        return $this->employee[$i]['holidays_before'];
+        return $this->user[$i]['holidays_before'];
     }
 
     public function date()
     {
         if ($this->check()) {
-            throw new \DomainException('No holidays found for this employee.');
+            throw new \DomainException('No holidays found for this user.');
         }
 
         for ($i = 0; $i < $this->count(); $i++)

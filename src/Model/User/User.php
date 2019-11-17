@@ -23,7 +23,7 @@ class User
 
     /**
      * @var ArrayCollection|Holiday[]
-     * @ORM\OneToMany(targetEntity="App\Model\Holiday\Entity\Holiday\Holiday", mappedBy="user", orphanRemoval=true, cascade={"all"})
+     * @ORM\OneToMany(targetEntity="App\Model\Holiday\Holiday", mappedBy="user", orphanRemoval=true, cascade={"all"})
      */
     private $holiday;
 

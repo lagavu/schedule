@@ -90,7 +90,7 @@ class Json
         }
     }
 
-    public function getJSON($shedule)
+    public function getJson($shedule)
     {
         $range = [
             ['start' => $this->user->getMorningWorkHoursFrom()->Format('H:i:s'),

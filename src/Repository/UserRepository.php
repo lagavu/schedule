@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Model\User\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\EntityRepository;
@@ -22,23 +23,13 @@ class UserRepository
         $this->repo = $em->getRepository(User::class);
     }
 
-    public function findUser($id)
+    public function findUser(int $id): User
     {
-        if ($this->repo->findOneBy(['id' => $id]) === null)
+        /** @var User $user */
+        if (!$user = $this->repo->findOneBy(['id' => $id]))
         {
             throw new EntityNotFoundException('User not found.');
         }
-        return $this->repo->findOneBy(['id' => $id]);
+        return $user;
     }
-
-    /*
-    public function maxHour()
-    {
-        $stmt = $this->connection->createQueryBuilder()
-            ->select('MAX(morning_work_hours_before) morning_work_hours_before')
-            ->from('user_users')
-            ->execute();
-        return $stmt->fetchAll();
-    }
-    */
 }

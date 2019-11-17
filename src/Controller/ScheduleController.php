@@ -6,6 +6,7 @@ use App\RemoteService\GoogleCalendar;
 use App\Repository\HolidayRepository;
 use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
+use App\Service\Schedule\Schedule;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -75,26 +76,25 @@ class ScheduleController extends AbstractController
     /**
      * @Route("schedule", name="schedule", methods={"GET"})
      * @param Request $request
-     * @param UserRepository $userRepository
-     * @param HolidayRepository $holidayRepository
-     * @param PartyRepository $partyRepository
+     * @param Schedule $schedule
      * @return Response
-     * @throws EntityNotFoundException
      */
-    public function schedule(Request $request, UserRepository $userRepository, HolidayRepository $holidayRepository, PartyRepository $partyRepository): Response
+    public function schedule(Request $request, Schedule $schedule): Response
     {
        $userId = $request->query->get('userId');
        $startDate = $request->query->get('startDate');
        $endDate = $request->query->get('endDate');
 
-       $user = $userRepository->findUser($userId);
-       $holidays = $holidayRepository->all($userId);
-       $parties = $partyRepository->all();
+       $user = $schedule->getUser($userId);
+      // $holidays = $holidayRepository->all($userId);
+      // $parties = $partyRepository->all();
 
-       $s = new Schedule($user);
-       $s->getSchedule($startDate, $endDate);
+      //  $scheduleUser = new Schedule($user);
+        $schedule->getSchedule();
 
-       dd($userId, $startDate, $endDate, $user, $holidays, $parties);
+        $JsonResponse = $schedule->getJson($userId, $startDate, $endDate);
+
+        dd($userId, $startDate, $endDate, $user, $schedule->getSchedule(), $JsonResponse);
     }
 
 }

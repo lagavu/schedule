@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
-namespace App\Model\Party;
+namespace App\Service\Party;
 
 use Carbon\Carbon;
 
-class Date
+class Party
 {
     private $party;
 

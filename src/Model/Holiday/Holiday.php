@@ -35,7 +35,7 @@ class Holiday
 
     /**
      * @var User
-     * @ORM\ManyToOne(targetEntity="App\Model\User\Entity\User\User", inversedBy="holiday")
+     * @ORM\ManyToOne(targetEntity="App\Model\User\User", inversedBy="holiday")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $user;
