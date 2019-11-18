@@ -1,73 +1,62 @@
 <?php
 
-
 namespace App\Service\Schedule;
-
 
 use App\Service\Holiday\Holiday;
 use App\Service\Party\Party;
 use App\RemoteService\GoogleCalendar;
 use App\Repository\UserRepository;
-use App\Service\User\Json;
 use Carbon\Carbon;
 
 class Schedule
 {
-    private $userId;
-    private $startDate;
-    private $endDate;
+    private $json;
     private $party;
     private $holiday;
-    private $json;
     private $calendar;
+    private $userRepository;
 
     public function __construct(
-        int $userId,
-        $startDate,
-        $endDate,
+        Json $json,
         Party $party,
         Holiday $holiday,
-        Json $json,
-        GoogleCalendar $calendar)
+        UserRepository $userRepository,
+        GoogleCalendar $calendar )
     {
-        $this->userId = $userId;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
+        $this->json = $json;
         $this->party = $party;
         $this->holiday = $holiday;
-        $this->json = $json;
         $this->calendar = $calendar;
-
-    }
-
-
-/*
-    public function getSchedule()
-    {
-        return $this->party->all();
+        $this->userRepository = $userRepository;
     }
 
     public function getUser(int $userId): object
     {
-        return $this->user->findUser($userId);
+        return $this->userRepository->findUser($userId);
     }
 
-
-
-*/
-
-
-
-    public  function getJson($user, $startDate, $endDate)
+    public function getHolidays(int $userId): array
     {
-        return 333;
+        return $this->holiday->getUserHolidays($userId);
     }
 
-
-    public function date()
+    public function getParties(): array
     {
-        $start = new Carbon($this->startDate);
-        $end = new Carbon($this->endDate);
+        return $this->party->parties();
+    }
+
+    public  function getJson(int $userId, string $startDate, string $endDate): string
+    {
+        $schedule = $this->getSchedule($userId, $startDate, $endDate);
+        return $this->json->getJson($userId, $schedule);
+    }
+
+    public function date(string $startDate, string $endDate): array
+    {
+        $date = [];
+
+        $start = new Carbon($startDate);
+        $end = new Carbon($endDate);
 
         while ($start->lte($end)) {
             $date[] = $start->toDateString();
@@ -76,15 +65,12 @@ class Schedule
         return $date;
     }
 
-    public function current(): string
+    public function weekend(string $startDate, string $endDate): array
     {
-        return date('Y-m-d', strtotime($this->startDate));
-    }
+        $start = strtotime($startDate);
+        $end = strtotime($endDate);
 
-    public function weekend(): array
-    {
-        $start = strtotime($this->startDate);
-        $end = strtotime($this->endDate);
+        $result = [];
 
         while ($start <= $end)
         {
@@ -97,13 +83,14 @@ class Schedule
         return $result;
     }
 
-    public function shedule()
+    public function getSchedule(int $userId, string $startDate, string $endDate): array
     {
         return array_diff(
-            $this->date(),
-            $this->holiday->date(),
+            $this->date($startDate, $endDate),
+            $this->holiday->date($userId),
+            $this->holiday->date($userId),
             $this->calendar->current(),
             $this->party->exclude(),
-            $this->weekend());
+            $this->weekend($startDate, $endDate));
     }
 }

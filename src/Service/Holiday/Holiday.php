@@ -7,47 +7,51 @@ use Carbon\Carbon;
 
 class Holiday
 {
-    private $id;
     private $holiday;
-    private $user;
 
-    public function __construct($id, HolidayRepository $holiday)
+    public function __construct(HolidayRepository $holiday)
     {
-        $this->id = $id;
         $this->holiday = $holiday;
-        $this->user = $holiday->findHoliday($id);
-
-    }
-    public function count()
-    {
-        return count($this->user);
     }
 
-    public function check()
+    public function getUserHolidays(int $userId): array
     {
-        return $this->count() == 0;
+        return $this->holiday->userHolidays($userId);
     }
 
-    public function from(int $i)
+    public function count($userHolidays): int
     {
-        return $this->user[$i]['holidays_from'];
+        return count((array)$userHolidays);
     }
 
-    public function before(int $i)
+    public function check(int $userId): bool
     {
-        return $this->user[$i]['holidays_before'];
+        $userHolidays = $this->getUserHolidays($userId);
+        return $this->count($userHolidays) == 0;
     }
 
-    public function date()
+    public function from(int $i, int $userId): object
     {
-        if ($this->check()) {
+        return $this->getUserHolidays($userId)[$i]->getHolidaysFrom();
+    }
+
+    public function before(int $i, int $userId): object
+    {
+        return $this->getUserHolidays($userId)[$i]->getHolidaysBefore();
+    }
+
+    public function date(int $userId): array
+    {
+        if ($this->check($userId)) {
             throw new \DomainException('No holidays found for this user.');
         }
 
-        for ($i = 0; $i < $this->count(); $i++)
+        $holiday = [];
+
+        for ($i = 0; $i < $this->count($this->getUserHolidays($userId)); $i++)
         {
-            $start = new Carbon($this->from($i));
-            $end = new Carbon($this->before($i));
+            $start = new Carbon($this->from($i, $userId)->format('Y-m-d'));
+            $end = new Carbon($this->before($i, $userId)->format('Y-m-d'));
 
             while ($start->lte($end)) {
                 $holiday[] = $start->toDateString();

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\RemoteService;
 
 class GoogleCalendar
@@ -23,6 +21,7 @@ class GoogleCalendar
     {
         $calendar = GoogleCalendar::calendar();
         $count = GoogleCalendar::count();
+        $date = [];
 
         for ($i=0; $i < $count; $i++)
         {
@@ -35,6 +34,7 @@ class GoogleCalendar
     {
         $calendar = GoogleCalendar::calendar();
         $count = GoogleCalendar::count();
+        $name = [];
 
         for ($i=0; $i < $count; $i++)
         {
@@ -48,6 +48,8 @@ class GoogleCalendar
         $count = GoogleCalendar::count();
         $date = GoogleCalendar::date();
         $name = GoogleCalendar::name();
+        $holiday = [];
+
         for ($i = 0; $i < $count; $i++)
         {
             $holiday[] = [

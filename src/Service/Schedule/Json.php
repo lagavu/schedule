@@ -1,39 +1,43 @@
 <?php
 
+namespace App\Service\Schedule;
 
-namespace App\Service\User;
-
-
+use App\Repository\PartyRepository;
+use App\Repository\UserRepository;
 
 class Json
 {
-    private $party;
-    private $user;
+    private $userRepository;
     private $parties;
-    private $userFetcher;
 
-    public function __construct($party, $user, $parties, $userFetcher)
+    public function __construct(UserRepository $userRepository, PartyRepository $parties)
     {
-        $this->party = $party;
-        $this->user = $user;
+        $this->userRepository = $userRepository;
         $this->parties = $parties;
-        $this->userFetcher = $userFetcher;
     }
 
-    public function check($s)
+    public function findUser(int $userId): object
     {
-        foreach ($this->parties->all() as $party) {
-            $res = $this->party->count();
+        return $this->userRepository->findUser($userId);
+    }
+
+    public function check(string $s)
+    {
+        $res = count((array)$this->parties->parties());
+
+        $arr = [];
+
+        foreach ($this->parties->parties() as $party) {
             {
                 for ($i=0; $i < $res; $i++)
-                    $new = [
+                    $arr = [
                         $party->getPartyDayFrom()->Format('Y-m-d'),
                         $party->getPartyTimeFrom()->Format('H:i:s')
                     ];
             }
 
-            if ($s === $new['0']) {
-                $s = $new;
+            if ($s === $arr['0']) {
+                $s = $arr;
             }
         }
         return $s;
@@ -41,11 +45,13 @@ class Json
 
     public function party($s)
     {
-        $res = $this->party->count();
+        $res = count((array)$this->parties->parties());
+
+        $allDate = [];
 
         for ($i=0; $i < $res; $i++)
         {
-            $allDate[]=$this->parties->all()[$i];
+            $allDate[]=$this->parties->parties()[$i];
         }
 
         if (is_array($s) && in_array($s['0'], $allDate))
@@ -56,7 +62,7 @@ class Json
         }
     }
 
-    public function time($s, $range)
+    public function time($userId, $s, $range)
     {
         if (!is_array($range))
         {
@@ -67,10 +73,10 @@ class Json
             {
                 if ($s['1'] < $val['end']
                     && $s['1'] > $val['start']
-                    && $this->userFetcher->maxHour()[0]['morning_work_hours_before'] > $s['1'])
+                    && $this->userRepository->maxMorningHour($userId)[0]['morning_work_hours_before'] > $s['1'])
                 {
                     $range = [
-                        ['start' => $this->user->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $s['1']],
+                        ['start' => $this->findUser($userId)->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $s['1']],
                     ];
                     return $range;
                     break;
@@ -79,8 +85,8 @@ class Json
                     && $s['1'] > $range[1]['start'])
                 {
                     $range = [
-                        ['start' => $this->user->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $this->user->getMorningWorkHoursBefore()->Format('H:i:s')],
-                        ['start' => $this->user->getAfternoonWorkHoursFrom()->Format('H:i:s'), 'end' => $s['1']]
+                        ['start' => $this->findUser($userId)->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $this->findUser($userId)->getMorningWorkHoursBefore()->Format('H:i:s')],
+                        ['start' => $this->findUser($userId)->getAfternoonWorkHoursFrom()->Format('H:i:s'), 'end' => $s['1']]
                     ];
                     return $range;
                     break;
@@ -90,21 +96,22 @@ class Json
         }
     }
 
-    public function getJson($shedule)
+    public function getJson(int $userId, array $schedule): string
     {
         $range = [
-            ['start' => $this->user->getMorningWorkHoursFrom()->Format('H:i:s'),
-             'end' => $this->user->getMorningWorkHoursBefore()->Format('H:i:s')] ,
-            ['start' => $this->user->getAfternoonWorkHoursFrom()->Format('H:i:s'),
-             'end' => $this->user->getAfternoonWorkHoursBefore()->Format('H:i:s')]
+            ['start' => $this->findUser($userId)->getMorningWorkHoursFrom()->Format('H:i:s'),
+             'end' => $this->findUser($userId)->getMorningWorkHoursBefore()->Format('H:i:s')] ,
+            ['start' => $this->findUser($userId)->getAfternoonWorkHoursFrom()->Format('H:i:s'),
+             'end' => $this->findUser($userId)->getAfternoonWorkHoursBefore()->Format('H:i:s')]
         ];
-        $data = array_map(function($s) use ($range){
+        $data = array_map(function($s) use ($range, $userId){
             return [
                 'day' => $this->party($this->check($s)),
-                'timeRangers' => $this->time($this->check($s), $range)
+                'timeRangers' => $this->time($userId, $this->check($s), $range)
             ];
-        }, $shedule);
+        }, $schedule);
         $result = ['schedule' => $data];
+
         return json_encode($result, JSON_PRETTY_PRINT);
     }
 }

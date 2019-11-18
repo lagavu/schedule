@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Repository;
 
 use App\Model\User\User;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\EntityRepository;
@@ -16,9 +15,11 @@ class UserRepository
      * @var EntityRepository
      */
     private $repo;
+    private $connection;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(Connection $connection, EntityManagerInterface $em)
     {
+        $this->connection = $connection;
         $this->em = $em;
         $this->repo = $em->getRepository(User::class);
     }
@@ -31,5 +32,17 @@ class UserRepository
             throw new EntityNotFoundException('User not found.');
         }
         return $user;
+    }
+
+    public function maxMorningHour($userId)
+    {
+        $qb = $this->connection->createQueryBuilder()
+            ->select('MAX(morning_work_hours_before) morning_work_hours_before')
+            ->select('MAX(morning_work_hours_before) morning_work_hours_before')
+            ->from('user_users')
+            ->andWhere('id = :id')
+            ->setParameter(':id', $userId)
+            ->execute();
+        return $qb->fetchAll();
     }
 }

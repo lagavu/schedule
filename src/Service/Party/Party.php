@@ -2,48 +2,55 @@
 
 namespace App\Service\Party;
 
+use App\Repository\PartyRepository;
 use Carbon\Carbon;
 
 class Party
 {
     private $party;
 
-    public function __construct($party)
+    public function __construct(PartyRepository $party)
     {
-        $this->party = $party->party();
+        $this->party = $party;
     }
+
+    public function parties(): array
+    {
+        return $this->party->parties();
+    }
+
     public function count(): int
     {
-        return count($this->party);
+        return count((array)$this->parties());
     }
-
-
 
     public function check(): bool
     {
         return $this->count() == 0;
     }
 
-    public function from(int $i): string
+    public function from(int $i): object
     {
-        return $this->party[$i]['party_day_from'];
+        return $this->party->parties()[$i]->getPartyDayFrom();
     }
 
-    public function before(int $i): string
+    public function before(int $i): object
     {
-        return $this->party[$i]['party_day_before'];
+        return $this->party->parties()[$i]->getPartyDayBefore();
     }
 
-    public function day(int $i): string
+    public function day(int $i): object
     {
-        return $this->party[$i]['party_day_from'];
+        return $this->party->parties()[$i]->getPartyDayFrom();
     }
 
     public function first(): array
     {
+        $first = [];
+
         for ($i=0; $i < $this->count(); $i++)
         {
-            $first[] = $this->day($i);
+            $first[] = $this->day($i)->format('Y-m-d');
         }
         return $first;
     }
@@ -58,10 +65,13 @@ class Party
        if ($this->check()) {
            throw new \DomainException('No company parties.');
        }
+
+        $party = [];
+
         for ($i = 0; $i < $this->count(); $i++) {
 
-            $start = new Carbon($this->from($i));
-            $end = new Carbon($this->before($i));
+            $start = new Carbon($this->from($i)->format('Y-m-d'));
+            $end = new Carbon($this->before($i)->format('Y-m-d'));
 
             while ($start->lte($end)) {
                 $party[] = $start->toDateString();

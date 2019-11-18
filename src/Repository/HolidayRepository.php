@@ -2,10 +2,8 @@
 
 namespace App\Repository;
 
-
 use App\Model\Holiday\Holiday;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
 
 class HolidayRepository
 {
@@ -20,23 +18,8 @@ class HolidayRepository
         $this->em = $em;
     }
 
-    public function findHoliday(int $id): Holiday
+    public function userHolidays(int $userId): array
     {
-        /** @var Holiday $holidays */
-        if (!$holidays = $this->repo->findOneBy(['user_id' => $id])) {
-            throw new EntityNotFoundException('Holidays is not found.');
-        }
-        return $holidays;
+        return $this->repo->findBy(['user_id' => $userId]);
     }
-
-    /*
-    public function all(int $id): object
-    {
-        if (!$holidays = $this->repo->findAll(['user_id' => $id])) {
-            throw new EntityNotFoundException('Holidays is not found.');
-        }
-        return $holidays;
-    }
-    */
-
 }
