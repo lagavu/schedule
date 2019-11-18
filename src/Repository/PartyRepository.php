@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Model\Party\Party;
+use App\Model\Party;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 

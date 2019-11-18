@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Holiday;
+namespace App\Service;
 
 use App\Repository\HolidayRepository;
 use Carbon\Carbon;

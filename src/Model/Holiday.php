@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Holiday;
+namespace App\Model;
 
 use App\Model\User\User;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,7 +35,7 @@ class Holiday
 
     /**
      * @var User
-     * @ORM\ManyToOne(targetEntity="App\Model\User\User", inversedBy="holiday")
+     * @ORM\ManyToOne(targetEntity="App\Model\User", inversedBy="holiday")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $user;

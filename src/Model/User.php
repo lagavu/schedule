@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Model\User;
+namespace App\Model;
 
 
-use App\Model\Holiday\Holiday;
+use App\Model\Holiday;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,7 +23,7 @@ class User
 
     /**
      * @var ArrayCollection|Holiday[]
-     * @ORM\OneToMany(targetEntity="App\Model\Holiday\Holiday", mappedBy="user", orphanRemoval=true, cascade={"all"})
+     * @ORM\OneToMany(targetEntity="App\Model\Holiday", mappedBy="user", orphanRemoval=true, cascade={"all"})
      */
     private $holiday;
 

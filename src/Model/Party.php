@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Party;
+namespace App\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 

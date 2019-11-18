@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Model\User\User;
+use App\Model\User;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
@@ -24,17 +24,12 @@ class UserRepository
         $this->repo = $em->getRepository(User::class);
     }
 
-    public function findUser(int $id): User
+    public function findUser(int $id): object
     {
-        /** @var User $user */
-        if (!$user = $this->repo->findOneBy(['id' => $id]))
-        {
-            throw new EntityNotFoundException('User not found.');
-        }
-        return $user;
+        return $this->repo->findOneBy(['id' => $id]);
     }
 
-    public function maxMorningHour($userId)
+    public function maxMorningWorkHour($userId)
     {
         $qb = $this->connection->createQueryBuilder()
             ->select('MAX(morning_work_hours_before) morning_work_hours_before')

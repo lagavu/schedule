@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Party;
+namespace App\Service;
 
 use App\Repository\PartyRepository;
 use Carbon\Carbon;

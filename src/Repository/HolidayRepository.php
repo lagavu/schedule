@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Model\Holiday\Holiday;
+use App\Model\Holiday;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HolidayRepository

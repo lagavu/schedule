@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\RemoteService\GoogleCalendar;
-use App\Service\Schedule\Schedule;
+use App\Service\Schedule;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,15 +37,15 @@ class ScheduleController extends AbstractController
        $startDate = $request->query->get('startDate');
        $endDate = $request->query->get('endDate');
 
-       $JsonResponse = $schedule->getJson($userId, $startDate, $endDate);
+       $scheduleUser = $schedule->getSchedule($userId, $startDate, $endDate);
 
         return $this->render('schedule/index.html.twig', [
-            'json' => $JsonResponse,
+            'json' => $scheduleUser,
             'user' => $schedule->getUser($userId),
             'holidays' => $schedule->getHolidays($userId),
             'parties' => $schedule->getParties(),
-            'year' => date('Y'),
             'calendar' => $calendar->holiday(),
+            'year' => date('Y'),
         ]);
     }
 }
