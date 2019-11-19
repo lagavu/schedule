@@ -42,6 +42,13 @@ class Schedule
 
     public function getSchedule(int $userId, string $startDate, string $endDate): string
     {
+
+        $user = $this->getUser($userId);
+
+        $holidays = $user->getEmployeeHolidays();
+
+        dd($user, $holidays);
+
         $schedule = $this->workingDates($userId, $startDate, $endDate);
         return $this->getJson($userId, $schedule);
     }

@@ -13,8 +13,6 @@ class ScheduleController extends AbstractController
 {
     /**
      * @Route("/", name="index")
-     * @param GoogleCalendar $calendar
-     * @return Response
      */
     public function index(GoogleCalendar $calendar): Response
     {

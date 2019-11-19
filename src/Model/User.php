@@ -23,9 +23,9 @@ class User
 
     /**
      * @var ArrayCollection|EmployeeHolidays[]
-     * @ORM\OneToMany(targetEntity="App\Model\EmployeeHolidays", mappedBy="user", orphanRemoval=true, cascade={"all"})
+     * @ORM\OneToMany(targetEntity="EmployeeHolidays", mappedBy="user")
      */
-    private $holiday;
+    private $employeeHolidays;
 
     /**
      * @ORM\Column(type="time")
@@ -49,7 +49,7 @@ class User
 
     public function __construct()
     {
-        $this->holiday = new ArrayCollection();
+        $this->employeeHolidays = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -58,27 +58,27 @@ class User
     }
 
     /**
-     * @return Collection|EmployeeHolidays[]
+     * @return EmployeeHolidays[]|null
      */
-    public function getHoliday(): Collection
+    public function getEmployeeHolidays(): Collection
     {
-        return $this->holiday;
+        return $this->employeeHolidays;
     }
 
-    public function addHoliday(EmployeeHolidays $holiday): self
+    public function addEmployeeHolidays(EmployeeHolidays $holiday): self
     {
-        if (!$this->holiday->contains($holiday)) {
-            $this->holiday[] = $holiday;
+        if (!$this->employeeHolidays->contains($holiday)) {
+            $this->employeeHolidays[] = $holiday;
             $holiday->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeHoliday(EmployeeHolidays $holiday): self
+    public function removeEmployeeHolidays(EmployeeHolidays $holiday): self
     {
-        if ($this->holiday->contains($holiday)) {
-            $this->holiday->removeElement($holiday);
+        if ($this->employeeHolidays->contains($holiday)) {
+            $this->employeeHolidays->removeElement($holiday);
             // set the owning side to null (unless already changed)
             if ($holiday->getUser() === $this) {
                 $holiday->setUser(null);

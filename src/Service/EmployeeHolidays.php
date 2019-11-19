@@ -9,6 +9,46 @@ use Carbon\Carbon;
 
 class EmployeeHolidays
 {
+    private $user;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+    /*
+    public function getEmployeeHolidays(User $user)
+    {
+        $this->user = $user;
+    }
+
+
+    */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
     private $employeeHoliday;
 
     public function __construct(EmployeeHolidaysRepository $holidayRepository)
@@ -31,13 +71,22 @@ class EmployeeHolidays
         return $this->getUserHolidays($userId)[$i]->getHolidaysBefore();
     }
 
+
     public function getUserHolidays(int $userId): array
     {
+
         return $this->employeeHoliday->userHolidays($userId);
     }
 
+*/
+
+
+
     public function employeeHolidayDates(int $userId): array
     {
+
+        dd($this->user, $this->user->getEmployeeHolidays());
+
         $holidays = [];
 
         for ($i = 0; $i < $this->countHolidayEmployee($this->getUserHolidays($userId)); $i++)
@@ -52,4 +101,9 @@ class EmployeeHolidays
         }
         return $holidays;
     }
+
+
+
+
+
 }

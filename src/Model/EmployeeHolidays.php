@@ -34,7 +34,7 @@ class EmployeeHolidays
 
     /**
      * @var User
-     * @ORM\ManyToOne(targetEntity="App\Model\User", inversedBy="holiday")
+     * @ORM\ManyToOne(targetEntity="App\Model\User", inversedBy="employeeHolidays")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
      */
     private $user;
@@ -90,5 +90,10 @@ class EmployeeHolidays
         $this->user = $user;
 
         return $this;
+    }
+
+    public function test()
+    {
+        dd(444);
     }
 }

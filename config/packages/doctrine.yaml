@@ -25,12 +25,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Model'
                 prefix: 'App\Model'
                 alias: User
-            Holiday:
+            EmployeeHolidays:
                 is_bundle: false
                 type: annotation
                 dir: '%kernel.project_dir%/src/Model'
                 prefix: 'App\Model'
-                alias: EmployeeHoliday
+                alias: EmployeeHolidays
             Party:
                 is_bundle: false
                 type: annotation
