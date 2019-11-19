@@ -15,7 +15,7 @@ class Schedule
 
     public function __construct(
         Party $party,
-        Holiday $holiday,
+        EmployeeHolidays $holiday,
         UserRepository $userRepository,
         GoogleCalendar $calendar)
     {
@@ -37,10 +37,10 @@ class Schedule
 
     public function getParties(): array
     {
-        return $this->party->parties();
+        return $this->party->getParties();
     }
 
-    public  function getSchedule(int $userId, string $startDate, string $endDate): string
+    public function getSchedule(int $userId, string $startDate, string $endDate): string
     {
         $schedule = $this->workingDates($userId, $startDate, $endDate);
         return $this->getJson($userId, $schedule);
@@ -71,8 +71,8 @@ class Schedule
         {
             if (date('N', $startDateUnixTime) >= 6)
             {
-                $current = date('Y-m-d', $startDateUnixTime);
-                $excludeWeekendRequest[] = $current;
+                $currentDate = date('Y-m-d', $startDateUnixTime);
+                $excludeWeekendRequest[] = $currentDate;
             } $startDateUnixTime += 86400;
         }
         return $excludeWeekendRequest;
@@ -82,120 +82,116 @@ class Schedule
     {
         return array_diff(
             $this->requestDates($startDate, $endDate),
-            $this->holiday->date($userId),
-            $this->holiday->date($userId),
-            $this->calendar->current(),
-            $this->party->exclude(),
+            $this->holiday->employeeHolidayDates($userId),
+            $this->calendar->currentYearHolidaysRussia(),
+            $this->party->employeePartyDates(),
             $this->excludeWeekendRequest($startDate, $endDate));
-    }
-
-
-
-
-
-
-
-    public function checkPartiesDays(string $employeeWorkDay)
-    {
-        $countParties = count((array)$this->getParties());
-
-        $arr = [];
-
-        foreach ($this->getParties() as $party) {
-            {
-                for ($i=0; $i < $countParties; $i++)
-                    $arr = [
-                        $party->getPartyDayFrom()->Format('Y-m-d'),
-                        $party->getPartyTimeFrom()->Format('H:i:s')
-                    ];
-            }
-
-            if ($employeeWorkDay === $arr['0']) {
-                $employeeWorkDay = $arr;
-            }
-        }
-        return $employeeWorkDay;
-    }
-/*
-    public function party($employeeWorkDay)
-    {
-
-        $res = count((array)$this->getParties());
-
-        $allDate = [];
-
-        for ($i=0; $i < $res; $i++)
-        {
-            $allDate[]=$this->getParties()[$i];
-        }
-
-        if (is_array($employeeWorkDay) && in_array($employeeWorkDay['0'], $allDate))
-        {
-            return $employeeWorkDay['party_day_from'];
-        } else {
-            return $employeeWorkDay;
-        }
-        dd($employeeWorkDay['party_day_from']);
-    }
-*/
-    public function checkTimeArray(array $employeeWorkTime): bool
-    {
-        return !is_array($employeeWorkTime);
-    }
-
-    public function time($userId, $employeeWorkDay, $employeeWorkTime)
-    {
-        if($this->checkTimeArray($employeeWorkTime))
-        {
-            return $employeeWorkTime;
-        }
-
-        foreach ($employeeWorkTime as $workTimeSeparation)
-        {
-            if ($employeeWorkDay['1'] < $workTimeSeparation['end']
-                && $employeeWorkDay['1'] > $workTimeSeparation['start']
-                && $this->userRepository->maxMorningWorkHour($userId)[0]['morning_work_hours_before'] > $employeeWorkDay['1'])
-            {
-                $employeeWorkTime = [
-                    ['start' => $this->getUser($userId)->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $employeeWorkDay['1']],
-                ];
-                return $employeeWorkTime;
-                break;
-            }
-            elseif ($employeeWorkDay['1'] < $employeeWorkTime[1]['end']
-                && $employeeWorkDay['1'] > $employeeWorkTime[1]['start'])
-            {
-                $employeeWorkTime = [
-                    ['start' => $this->getUser($userId)->getMorningWorkHoursFrom()->Format('H:i:s'), 'end' => $this->getUser($userId)->getMorningWorkHoursBefore()->Format('H:i:s')],
-                    ['start' => $this->getUser($userId)->getAfternoonWorkHoursFrom()->Format('H:i:s'), 'end' => $employeeWorkDay['1']]
-                ];
-                return $employeeWorkTime;
-                break;
-            }
-            return $employeeWorkTime;
-        }
-
     }
 
     public function getJson(int $userId, array $schedule): string
     {
         $employeeWorkTime = [
-            ['start' => $this->getUser($userId)->getMorningWorkHoursFrom()->Format('H:i:s'),
-                'end' => $this->getUser($userId)->getMorningWorkHoursBefore()->Format('H:i:s')],
-            ['start' => $this->getUser($userId)->getAfternoonWorkHoursFrom()->Format('H:i:s'),
-                'end' => $this->getUser($userId)->getAfternoonWorkHoursBefore()->Format('H:i:s')]
+            ['start' => $this->startTimeMorning($userId),
+                'end' => $this->endTimeMorning($userId)],
+            ['start' => $this->startTimeAfternoon($userId),
+                'end' => $this->endTimeAfternoon($userId)]
         ];
-
-        $combineWorkDateAndTime = array_map(function($employeeWorkDay) use ($employeeWorkTime, $userId){
-
+        $combineWorkDateAndTime = array_map(function($employeeWorkDay) use ($employeeWorkTime, $userId)
+        {
             return [
-                'day' => date("d.m.Y", strtotime($this->checkPartiesDays($employeeWorkDay))),
-                'timeRangers' => $this->time($userId, $this->checkPartiesDays($employeeWorkDay), $employeeWorkTime)
+                'day' => $this->checkPartiesDays($employeeWorkDay),
+                'timeRangers' => $this->timeRangeWithParties($userId, $employeeWorkDay, $employeeWorkTime)
             ];
         }, $schedule);
-
         $combineSchedule = ['schedule' => $combineWorkDateAndTime];
 
         return json_encode($combineSchedule, JSON_PRETTY_PRINT);
+    }
+
+    public function startTimeMorning(int $userId): string
+    {
+        return $this->getUser($userId)->getMorningWorkHoursFrom()->Format('H:i:s');
+    }
+
+    public function endTimeMorning(int $userId): string
+    {
+        return $this->getUser($userId)->getMorningWorkHoursBefore()->Format('H:i:s');
+    }
+
+    public function startTimeAfternoon(int $userId): string
+    {
+        return $this->getUser($userId)->getAfternoonWorkHoursFrom()->Format('H:i:s');
+    }
+
+    public function endTimeAfternoon(int $userId): string
+    {
+        return $this->getUser($userId)->getAfternoonWorkHoursBefore()->Format('H:i:s');
+    }
+
+    public function timeRangeWithParties(int $userId, string $employeeWorkDay, array $employeeWorkTime): array
+    {
+        return $this->employeeTimeIfParties($userId, $this->checkPartiesDays($employeeWorkDay), $employeeWorkTime);
+    }
+
+    public function checkPartiesDays(string $employeeWorkDay)
+    {
+        $countParties = $this->party->countParties();
+        $DateParty = [];
+
+        foreach ($this->getParties() as $party) {
+            {
+                for ($i=0; $i < $countParties; $i++)
+                    $DateParty = [
+                        $party->getPartyDayFrom()->Format('Y-m-d'),
+                        $party->getPartyTimeFrom()->Format('H:i:s')
+                    ];
+            }
+            if ($employeeWorkDay === $DateParty['0']) {
+                $employeeWorkDay = $DateParty;
+            }
+        }
+        return $employeeWorkDay;
+    }
+
+    public function employeeTimeIfParties(int $userId, $employeeWorkDay, $employeeWorkTime): array
+    {
+        if(!is_array($employeeWorkTime))
+        {
+            return $employeeWorkTime;
+        }
+        foreach ($employeeWorkTime as $workTimeSeparation)
+        {
+            if ($this->checkMorningPartyTime( $userId, $employeeWorkDay, $workTimeSeparation))
+            {
+                $employeeWorkTime = [
+                    ['start' => $this->startTimeMorning($userId), 'end' => $employeeWorkDay['1']],
+                ];
+                return $employeeWorkTime;
+                break;
+            }
+            elseif ($this->checkAfternoonPartyTime($employeeWorkDay, $employeeWorkTime))
+            {
+                $employeeWorkTime = [
+                    ['start' => $this->startTimeMorning($userId), 'end' => $this->endTimeMorning($userId)],
+                    ['start' => $this->startTimeAfternoon($userId), 'end' => $employeeWorkDay['1']]
+                ];
+                return $employeeWorkTime;
+                break;
+            }
+            return $employeeWorkTime;
+        }
+    }
+
+    public function checkMorningPartyTime(int $userId, $employeeWorkDay, $workTimeSeparation): bool
+    {
+       return $employeeWorkDay['1'] < $workTimeSeparation['end']
+                && $employeeWorkDay['1'] > $workTimeSeparation['start']
+                && $this->endTimeMorning($userId) > $employeeWorkDay['1'];
+    }
+
+    public function checkAfternoonPartyTime($employeeWorkDay, $employeeWorkTime): bool
+    {
+        return $employeeWorkDay['1'] < $employeeWorkTime[1]['end']
+            && $employeeWorkDay['1'] > $employeeWorkTime[1]['start'];
     }
 }

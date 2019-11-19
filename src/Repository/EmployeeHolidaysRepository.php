@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
-use App\Model\Holiday;
+use App\Model\EmployeeHolidays;
 use Doctrine\ORM\EntityManagerInterface;
 
-class HolidayRepository
+class EmployeeHolidaysRepository
 {
     private $repo;
     private $connection;
@@ -13,7 +13,7 @@ class HolidayRepository
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->repo = $em->getRepository(Holiday::class);
+        $this->repo = $em->getRepository(EmployeeHolidays::class);
         $this->connection = $em->getConnection();
         $this->em = $em;
     }

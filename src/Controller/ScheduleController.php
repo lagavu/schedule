@@ -26,10 +26,6 @@ class ScheduleController extends AbstractController
 
     /**
      * @Route("schedule", name="schedule", methods={"GET"})
-     * @param Request $request
-     * @param Schedule $schedule
-     * @param GoogleCalendar $calendar
-     * @return Response
      */
     public function schedule(Request $request, Schedule $schedule, GoogleCalendar $calendar): Response
     {
@@ -39,12 +35,12 @@ class ScheduleController extends AbstractController
 
        $scheduleUser = $schedule->getSchedule($userId, $startDate, $endDate);
 
-        return $this->render('schedule/index.html.twig', [
+        return $this->render('schedule.html.twig', [
             'json' => $scheduleUser,
             'user' => $schedule->getUser($userId),
             'holidays' => $schedule->getHolidays($userId),
             'parties' => $schedule->getParties(),
-            'calendar' => $calendar->holiday(),
+            'calendar' => $calendar->holidaysRussiaDateAndName(),
             'year' => date('Y'),
         ]);
     }

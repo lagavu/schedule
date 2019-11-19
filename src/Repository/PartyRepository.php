@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Model\Party;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
 
 class PartyRepository
 {
@@ -17,11 +16,8 @@ class PartyRepository
         $this->repo = $em->getRepository(Party::class);
     }
 
-    public function parties()
+    public function getParties(): array
     {
-        if (!$parties = $this->repo->findAll()) {
-            throw new EntityNotFoundException('Parties is not found.');
-        }
-        return $parties;
+        return $this->repo->findAll();
     }
 }

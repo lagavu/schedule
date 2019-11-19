@@ -14,70 +14,61 @@ class Party
         $this->party = $party;
     }
 
-    public function parties(): array
+    private function fromParty(int $i): object
     {
-        return $this->party->parties();
+        return $this->party->getParties()[$i]->getPartyDayFrom();
     }
 
-    public function count(): int
+    private function beforeParty(int $i): object
     {
-        return count((array)$this->parties());
+        return $this->party->getParties()[$i]->getPartyDayBefore();
     }
 
-    public function check(): bool
+    private function dayParty(int $i): object
     {
-        return $this->count() == 0;
+        return $this->party->getParties()[$i]->getPartyDayFrom();
     }
 
-    public function from(int $i): object
+    private function firstDayParty(): array
     {
-        return $this->party->parties()[$i]->getPartyDayFrom();
-    }
+        $firstDayParty = [];
 
-    public function before(int $i): object
-    {
-        return $this->party->parties()[$i]->getPartyDayBefore();
-    }
-
-    public function day(int $i): object
-    {
-        return $this->party->parties()[$i]->getPartyDayFrom();
-    }
-
-    public function first(): array
-    {
-        $first = [];
-
-        for ($i=0; $i < $this->count(); $i++)
+        for ($i=0; $i < $this->countParties(); $i++)
         {
-            $first[] = $this->day($i)->format('Y-m-d');
+            $firstDayParty[] = $this->dayParty($i)->format('Y-m-d');
         }
-        return $first;
+        return $firstDayParty;
     }
 
-    public function exclude(): array
+    public function countParties(): int
     {
-        return array_diff($this->date(), $this->first());
+        return count((array) $this->getParties());
     }
 
-    public function date(): array
+    public function employeePartyDates(): array
     {
-       if ($this->check()) {
-           throw new \DomainException('No company parties.');
-       }
+        return array_diff($this->allPartyDates(), $this->firstDayParty());
+    }
 
-        $party = [];
+    public function getParties(): array
+    {
+        return $this->party->getParties();
+    }
 
-        for ($i = 0; $i < $this->count(); $i++) {
+    public function allPartyDates(): array
+    {
+        $parties = [];
 
-            $start = new Carbon($this->from($i)->format('Y-m-d'));
-            $end = new Carbon($this->before($i)->format('Y-m-d'));
+        for ($i = 0; $i < $this->countParties(); $i++) {
 
-            while ($start->lte($end)) {
-                $party[] = $start->toDateString();
-                $start->addDay();
+            $startDateParty = new Carbon($this->fromParty($i)->format('Y-m-d'));
+            $endDateParty = new Carbon($this->beforeParty($i)->format('Y-m-d'));
+
+            while ($startDateParty->lte($endDateParty)) {
+                $parties[] = $startDateParty->toDateString();
+                $startDateParty->addDay();
             }
         }
-        return $party;
+        return $parties;
     }
 }

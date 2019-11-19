@@ -3,7 +3,7 @@
 namespace App\Model;
 
 
-use App\Model\Holiday;
+use App\Model\EmployeeHolidays;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,8 +22,8 @@ class User
     private $id;
 
     /**
-     * @var ArrayCollection|Holiday[]
-     * @ORM\OneToMany(targetEntity="App\Model\Holiday", mappedBy="user", orphanRemoval=true, cascade={"all"})
+     * @var ArrayCollection|EmployeeHolidays[]
+     * @ORM\OneToMany(targetEntity="App\Model\EmployeeHolidays", mappedBy="user", orphanRemoval=true, cascade={"all"})
      */
     private $holiday;
 
@@ -58,14 +58,14 @@ class User
     }
 
     /**
-     * @return Collection|Holiday[]
+     * @return Collection|EmployeeHolidays[]
      */
     public function getHoliday(): Collection
     {
         return $this->holiday;
     }
 
-    public function addHoliday(Holiday $holiday): self
+    public function addHoliday(EmployeeHolidays $holiday): self
     {
         if (!$this->holiday->contains($holiday)) {
             $this->holiday[] = $holiday;
@@ -75,7 +75,7 @@ class User
         return $this;
     }
 
-    public function removeHoliday(Holiday $holiday): self
+    public function removeHoliday(EmployeeHolidays $holiday): self
     {
         if ($this->holiday->contains($holiday)) {
             $this->holiday->removeElement($holiday);

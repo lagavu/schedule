@@ -2,14 +2,13 @@
 
 namespace App\Model;
 
-use App\Model\User\User;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="holiday_holidays")
  */
-class Holiday
+class EmployeeHolidays
 {
     /**
      * @ORM\Id()

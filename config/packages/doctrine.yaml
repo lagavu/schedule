@@ -30,7 +30,7 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Model'
                 prefix: 'App\Model'
-                alias: Holiday
+                alias: EmployeeHoliday
             Party:
                 is_bundle: false
                 type: annotation
