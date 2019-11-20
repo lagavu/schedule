@@ -7,17 +7,17 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class PartyRepository
 {
-    private $em;
-    private $repo;
+    private $entityManager;
+    private $repository;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->em = $em;
-        $this->repo = $em->getRepository(Party::class);
+        $this->entityManager = $entityManager;
+        $this->repository = $entityManager->getRepository(Party::class);
     }
 
     public function getParties(): array
     {
-        return $this->repo->findAll();
+        return $this->repository->findAll();
     }
 }

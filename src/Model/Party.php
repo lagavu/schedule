@@ -122,5 +122,4 @@ class Party
     {
         $this->end_time_party = $end_time_party;
     }
-
 }

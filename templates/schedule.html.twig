@@ -57,16 +57,16 @@
                     </tr>
                     <tr>
                         <td scope="row">График работы:</td>
-                        <td>c {{ user.morningworkhoursfrom|date('H:i:s') }} до {{ user.morningworkhoursbefore|date('H:i:s') }} <br>
-                            c {{ user.afternoonworkhoursfrom|date('H:i:s') }} до {{ user.afternoonworkhoursbefore|date('H:i:s') }}
+                        <td>c {{ user.startmorningworkhours|date('H:i:s') }} до {{ user.endmorningworkhours|date('H:i:s') }} <br>
+                            c {{ user.startafternoonworkhours|date('H:i:s') }} до {{ user.endafternoonworkhours|date('H:i:s') }}
                         </td>
                     </tr>
                 <td scope="row">Отпуск:</td>
-                {% if holidays  is defined %}
-                        {% for holiday in holidays %}
+                {% if vacations  is defined %}
+                        {% for vacation in vacations %}
                             <tr>
                                 <td>
-                                    от {{ holiday.holidaysfrom|date('Y.m.d') }} до {{ holiday.holidaysbefore|date('Y.m.d') }} <br>
+                                    от {{ vacation.startvacation|date('Y.m.d') }} до {{ vacation.endvacation|date('Y.m.d') }} <br>
                                     <br>
 
                                 </td>
@@ -94,8 +94,8 @@
                     {% for party in parties %}
                         <tr>
                             <td>{{ party.name }}</td>
-                            <td>{{ party.partydayfrom|date('Y.m.d') }} - {{ party.partytimefrom|date('H:i:s') }}</td>
-                            <td>{{ party.partydaybefore|date('Y.m.d') }}</td>
+                            <td>{{ party.startdayparty|date('Y.m.d') }} - {{ party.starttimeparty|date('H:i:s') }}</td>
+                            <td>{{ party.enddayparty|date('Y.m.d') }} - {{ party.endtimeparty|date('H:i:s') }}</td>
                         </tr>
                     {% endfor %}
                 {% endif %}
@@ -122,7 +122,9 @@
         <div class="col-6">
             <h5 class="font-weight-bolder">JSON</h5>
             <p>Выходные дни не учитываются</p>
-            {% ss %}
+                <pre>
+                 {{ json }}
+                </pre>
         </div>
     </div>
 </div>

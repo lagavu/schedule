@@ -150,5 +150,4 @@ class User
     {
         $this->end_afternoon_work_hours = $end_afternoon_work_hours;
     }
-
 }

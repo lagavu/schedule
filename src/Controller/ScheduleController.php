@@ -28,26 +28,25 @@ class ScheduleController extends AbstractController
      * @Route("schedule", name="schedule", methods={"GET"})
      */
     public function schedule(
-        Request $request,
-        PartyRepository $partyRepository,
-        UserRepository $userRepository,
-        GoogleCalendar $calendar): Response
+        Request $request, PartyRepository $partyRepository,
+        UserRepository $userRepository, GoogleCalendar $calendar): Response
     {
        $userId = $request->query->get('userId');
        $startDate = $request->query->get('startDate');
        $endDate = $request->query->get('endDate');
 
        $user = $userRepository->findUser($userId);
-       $schedule = new Schedule($user, $partyRepository, $userRepository, $calendar);
+       $parties = $partyRepository->getParties();
 
+       $schedule = new Schedule($user, $parties, $calendar);
        $scheduleUser = $schedule->getSchedule($startDate, $endDate);
 
         return $this->render('schedule.html.twig', [
             'json' => $scheduleUser,
             'user' => $user,
-            'holidays' => $schedule->getHolidays($userId),
+            'vacations' => $user->getVacation()->toArray(),
             'parties' => $partyRepository->getParties(),
-            'calendar' => $calendar->holidaysRussiaDateAndName(),
+            'calendar' => $calendar->getHolidaysRussiaDateAndName(),
             'year' => date('Y'),
         ]);
     }

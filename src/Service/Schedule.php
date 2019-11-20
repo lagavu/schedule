@@ -4,32 +4,52 @@ namespace App\Service;
 
 use App\Model\User;
 use App\RemoteService\GoogleCalendar;
-use App\Repository\PartyRepository;
-use App\Repository\UserRepository;
 use Carbon\Carbon;
 
 class Schedule
 {
     private $user;
+    private $parties;
     private $calendar;
-    private $userRepository;
-    private $partyRepository;
 
-    public function __construct(
-        User $user,
-        PartyRepository $partyRepository,
-        UserRepository $userRepository,
-        GoogleCalendar $calendar)
+    public function __construct(User $user, array $parties, GoogleCalendar $calendar)
     {
         $this->user = $user;
-        $this->userRepository = $userRepository;
-        $this->partyRepository = $partyRepository;
+        $this->parties = $parties;
         $this->calendar = $calendar;
     }
 
+    public function getSchedule(string $startDate, string $endDate): string
+    {
+        $schedule = $this->getWorkingDates($startDate, $endDate);
+        return $this->toJson($schedule);
+    }
 
+    private function getWorkingDates(string $startDate, string $endDate): array
+    {
+        dd(
+            $this->makeDatesRange($startDate, $endDate),
+            $this->getUserVacationDates(),
+            $this->calendar->getHolidaysRussia(),
+            $this->getCompanyPartiesDates(),
+            $this->removeWeekendFromRequestDates($startDate, $endDate),
+            array_diff(
+                $this->makeRequestDateRange($startDate, $endDate),
+                $this->getUserVacationDates(),
+                $this->calendar->getHolidaysRussia(),
+                $this->getCompanyPartiesDates(),
+                $this->removeWeekendFromRequestDates($startDate, $endDate)
 
-    private function getRequestDates(string $startDate, string $endDate): array
+        ));
+        return array_diff(
+            $this->makeDatesRange($startDate, $endDate),
+            $this->getUserVacationDates(),
+            $this->calendar->getHolidaysRussia(),
+            $this->getCompanyPartiesDates(),
+            $this->removeWeekendFromRequestDates($startDate, $endDate));
+    }
+
+    private function makeDatesRange(string $startDate, string $endDate): array
     {
         $requestDate = [];
         $startDateCarbon = new Carbon($startDate);
@@ -42,42 +62,7 @@ class Schedule
         return $requestDate;
     }
 
-    private function excludeWeekendRequest(string $startDate, string $endDate): array
-    {
-        $startDateUnixTime = strtotime($startDate);
-        $endDateUnixTime = strtotime($endDate);
-        $excludeWeekendRequest = [];
-
-        while ($startDateUnixTime <= $endDateUnixTime)
-        {
-            if (date('N', $startDateUnixTime) >= 6)
-            {
-                $currentDate = date('Y-m-d', $startDateUnixTime);
-                $excludeWeekendRequest[] = $currentDate;
-            } $startDateUnixTime += 86400;
-        }
-        return $excludeWeekendRequest;
-    }
-
-    private function getPartiesCompanyDates(): array
-    {
-        $partiesDate = [];
-        $allPartyCompany = $this->partyRepository->getParties();
-
-        for ($i = 0; $i < count($allPartyCompany); $i++) {
-
-            $startDateParty = new Carbon($allPartyCompany[$i]->getStartDayParty()->format('Y-m-d'));
-            $endDateParty = new Carbon($allPartyCompany[$i]->getEndDayParty()->format('Y-m-d'));
-
-            while ($startDateParty->lte($endDateParty)) {
-                $partiesDate[] = $startDateParty->toDateString();
-                $startDateParty->addDay();
-            }
-        }
-        return $partiesDate;
-    }
-
-    private function getEmployeeVacationDates(): array
+    private function getUserVacationDates(): array
     {
         $vacationsDate = [];
         $vacations = $this->user->getVacation()->toArray();
@@ -95,51 +80,59 @@ class Schedule
         return $vacationsDate;
     }
 
-
-
-    private function getScheduleDates(string $startDate, string $endDate): array
+    private function getCompanyPartiesDates(): array
     {
-        return array_diff(
-            $this->getRequestDates($startDate, $endDate),
-            $this->getEmployeeVacationDates(),
-            $this->calendar->currentYearHolidaysRussia(),
-            $this->getPartiesCompanyDates(),
-            $this->excludeWeekendRequest($startDate, $endDate));
+        $partiesDate = [];
+        $allPartyCompany = $this->parties;
+
+        for ($i = 0; $i < count($allPartyCompany); $i++) {
+
+            $startDateParty = new Carbon($allPartyCompany[$i]->getStartDayParty()->format('Y-m-d'));
+            $endDateParty = new Carbon($allPartyCompany[$i]->getEndDayParty()->format('Y-m-d'));
+
+            while ($startDateParty->lte($endDateParty)) {
+                $partiesDate[] = $startDateParty->toDateString();
+                $startDateParty->addDay();
+            }
+        }
+        return $partiesDate;
     }
 
-    public function getSchedule(string $startDate, string $endDate): string
+    private function removeWeekendFromRequestDates(string $startDate, string $endDate): array
     {
-        $schedule = $this->getScheduleDates($startDate, $endDate);
-        return $this->getJson($schedule);
-    }
+        $startDateUnixTime = strtotime($startDate);
+        $endDateUnixTime = strtotime($endDate);
+        $excludeWeekendRequest = [];
 
-
-
-
-
-
-
-
-
-
-
-    public function getJson(array $schedule): string
-    {
-
-        $employeeWorkTime = [
-            ['start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
-                'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')],
-            ['start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
-                'end' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s')]
-        ];
-
-        dd($employeeWorkTime);
-
-        $combineWorkDateAndTime = array_map(function($employeeWorkDay) use ($employeeWorkTime, $userId)
+        while ($startDateUnixTime <= $endDateUnixTime)
         {
+            if (date('N', $startDateUnixTime) >= 6)
+            {
+                $currentDate = date('Y-m-d', $startDateUnixTime);
+                $excludeWeekendRequest[] = $currentDate;
+            } $startDateUnixTime += 86400;
+        }
+        return $excludeWeekendRequest;
+    }
+
+    private function toJson(array $schedule): string
+    {
+        $userWorkTime = [
+            [
+                'start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
+                'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')
+            ],
+            [
+                'start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
+                'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
+            ]
+        ];
+        $combineWorkDateAndTime = array_map(function($userWorkDay) use ($userWorkTime)
+        {
+            $a = $this->getPartiesDatesFromRequestToCheck($userWorkDay);
             return [
-                'day' => $this->checkPartiesDays($employeeWorkDay),
-                'timeRangers' => $this->timeRangeWithParties($userId, $employeeWorkDay, $employeeWorkTime)
+                'day' => $this->getPartiesDatesFromRequestToCheck($userWorkDay),
+                'timeRangers' => $this->getWorkingTimeIfParty($a, $userWorkTime)
             ];
         }, $schedule);
         $combineSchedule = ['schedule' => $combineWorkDateAndTime];
@@ -147,81 +140,61 @@ class Schedule
         return json_encode($combineSchedule, JSON_PRETTY_PRINT);
     }
 
-
-
-
-
-    public function timeRangeWithParties(int $userId, string $employeeWorkDay, array $employeeWorkTime): array
+    private function getPartiesDatesFromRequestToCheck(string $userWorkDay)
     {
-        return $this->employeeTimeIfParties($userId, $this->checkPartiesDays($employeeWorkDay), $employeeWorkTime);
-    }
-
-
-
-
-    public function checkPartiesDays(string $employeeWorkDay)
-    {
-        $countParties = $this->party->countParties();
         $DateParty = [];
 
-        foreach ($this->getParties() as $party) {
-            {
-                for ($i=0; $i < $countParties; $i++)
-                    $DateParty = [
-                        $party->getPartyDayFrom()->Format('Y-m-d'),
-                        $party->getPartyTimeFrom()->Format('H:i:s')
-                    ];
-            }
-            if ($employeeWorkDay === $DateParty['0']) {
-                $employeeWorkDay = $DateParty;
+        foreach ($this->parties as $party)
+        {
+            for ($i=0; $i < count($this->parties); $i++)
+                $DateParty = [
+                    $party->getStartDayParty()->Format('Y-m-d'),
+                    $party->getStartTimeParty()->Format('H:i:s')
+                ];
+            if ($userWorkDay === $DateParty['0']) {
+                $userWorkDay = $DateParty;
             }
         }
-        return $employeeWorkDay;
+        return $userWorkDay;
     }
 
-
-
-    public function employeeTimeIfParties(int $userId, $employeeWorkDay, $employeeWorkTime): array
+    private function getWorkingTimeIfParty($userWorkDay, $userWorkTime): array
     {
-        if(!is_array($employeeWorkTime))
+        foreach ($userWorkTime as $workTimeSeparation)
         {
-            return $employeeWorkTime;
-        }
-        foreach ($employeeWorkTime as $workTimeSeparation)
-        {
-            if ($this->checkMorningPartyTime( $userId, $employeeWorkDay, $workTimeSeparation))
+            if ($this->checkMorningPartyTime( $userWorkDay, $workTimeSeparation))
             {
-                $employeeWorkTime = [
-                    ['start' => $this->startTimeMorning($userId), 'end' => $employeeWorkDay['1']],
+                $userWorkTime = [
+                    ['start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
+                       'end' => $userWorkDay['1']],
                 ];
-                return $employeeWorkTime;
+                return $userWorkTime;
                 break;
             }
-            elseif ($this->checkAfternoonPartyTime($employeeWorkDay, $employeeWorkTime))
+            elseif ($this->checkAfternoonPartyTime($userWorkDay, $userWorkTime))
             {
-                $employeeWorkTime = [
-                    ['start' => $this->startTimeMorning($userId), 'end' => $this->endTimeMorning($userId)],
-                    ['start' => $this->startTimeAfternoon($userId), 'end' => $employeeWorkDay['1']]
+                $userWorkTime = [
+                    ['start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
+                       'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')],
+                    ['start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
+                       'end' => $userWorkDay['1']]
                 ];
-                return $employeeWorkTime;
+                return $userWorkTime;
                 break;
             }
-            return $employeeWorkTime;
         }
+        return $userWorkTime;
     }
 
-
-
-    public function checkMorningPartyTime(int $userId, $employeeWorkDay, $workTimeSeparation): bool
+    private function checkMorningPartyTime($userWorkDay, $workTimeSeparation): bool
     {
-       return $employeeWorkDay['1'] < $workTimeSeparation['end']
-                && $employeeWorkDay['1'] > $workTimeSeparation['start']
-                && $this->endTimeMorning($userId) > $employeeWorkDay['1'];
+       return $userWorkDay['1'] < $workTimeSeparation['end']
+              && $userWorkDay['1'] > $workTimeSeparation['start']
+              && $this->user->getEndMorningWorkHours()->Format('H:i:s') > $userWorkDay['1'];
     }
 
-    public function checkAfternoonPartyTime($employeeWorkDay, $employeeWorkTime): bool
+    private function checkAfternoonPartyTime($userWorkDay, $userWorkTime): bool
     {
-        return $employeeWorkDay['1'] < $employeeWorkTime[1]['end']
-            && $employeeWorkDay['1'] > $employeeWorkTime[1]['start'];
+        return $userWorkDay['1'] < $userWorkTime[1]['end'] && $userWorkDay['1'] > $userWorkTime[1]['start'];
     }
 }
