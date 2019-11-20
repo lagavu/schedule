@@ -23,7 +23,7 @@ class UserRepository
         $this->repo = $em->getRepository(User::class);
     }
 
-    public function findUser(int $id): object
+    public function findUser(int $id): ?User
     {
         return $this->repo->findOneBy(['id' => $id]);
     }

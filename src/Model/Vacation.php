@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="holiday_holidays")
+ * @ORM\Table(name="vacation")
  */
-class EmployeeHolidays
+class Vacation
 {
     /**
      * @ORM\Id()
@@ -25,19 +25,19 @@ class EmployeeHolidays
     /**
      * @ORM\Column(type="date")
      */
-    private $holidays_from;
+    private $start_vacation;
 
     /**
      * @ORM\Column(type="date")
      */
-    private $holidays_before;
+    private $end_vacation;
 
     /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="App\Model\User", inversedBy="employeeHolidays")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Model\User", inversedBy="vacation")
+     * @ORM\JoinColumn(name = "user_id", referencedColumnName ="id")
      */
     private $user;
+
 
     public function getId(): ?int
     {
@@ -56,26 +56,26 @@ class EmployeeHolidays
         return $this;
     }
 
-    public function getHolidaysFrom(): ?\DateTimeInterface
+    public function getStartVacation(): ?\DateTimeInterface
     {
-        return $this->holidays_from;
+        return $this->start_vacation;
     }
 
-    public function setHolidaysFrom(\DateTimeInterface $holidays_from): self
+    public function setStartVacation(\DateTimeInterface $start_vacation): self
     {
-        $this->holidays_from = $holidays_from;
+        $this->start_vacation = $start_vacation;
 
         return $this;
     }
 
-    public function getHolidaysBefore(): ?\DateTimeInterface
+    public function getEndVacation(): ?\DateTimeInterface
     {
-        return $this->holidays_before;
+        return $this->end_vacation;
     }
 
-    public function setHolidaysBefore(\DateTimeInterface $holidays_before): self
+    public function setEndVacation(\DateTimeInterface $end_vacation): self
     {
-        $this->holidays_before = $holidays_before;
+        $this->end_vacation = $end_vacation;
 
         return $this;
     }
@@ -90,10 +90,5 @@ class EmployeeHolidays
         $this->user = $user;
 
         return $this;
-    }
-
-    public function test()
-    {
-        dd(444);
     }
 }

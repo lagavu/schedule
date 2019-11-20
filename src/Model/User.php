@@ -3,14 +3,14 @@
 namespace App\Model;
 
 
-use App\Model\EmployeeHolidays;
+use App\Model\Vacation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="user_users")
+ * @ORM\Table(name="user")
  */
 class User
 {
@@ -22,34 +22,33 @@ class User
     private $id;
 
     /**
-     * @var ArrayCollection|EmployeeHolidays[]
-     * @ORM\OneToMany(targetEntity="EmployeeHolidays", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Model\Vacation", mappedBy="user")
      */
-    private $employeeHolidays;
+    private $vacation;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $morning_work_hours_from;
+    private $start_morning_work_hours;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $morning_work_hours_before;
+    private $end_morning_work_hours;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $afternoon_work_hours_from;
+    private $start_afternoon_work_hours;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $afternoon_work_hours_before;
+    private $end_afternoon_work_hours;
 
     public function __construct()
     {
-        $this->employeeHolidays = new ArrayCollection();
+        $this->vacation = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -58,81 +57,98 @@ class User
     }
 
     /**
-     * @return EmployeeHolidays[]|null
+     * @return Collection|Vacation[]
      */
-    public function getEmployeeHolidays(): Collection
+    public function getVacation(): Collection
     {
-        return $this->employeeHolidays;
+        return $this->vacation;
     }
 
-    public function addEmployeeHolidays(EmployeeHolidays $holiday): self
+    public function addVacation(Vacation $vacation): self
     {
-        if (!$this->employeeHolidays->contains($holiday)) {
-            $this->employeeHolidays[] = $holiday;
-            $holiday->setUser($this);
+        if (!$this->vacation->contains($vacation)) {
+            $this->vacation[] = $vacation;
+            $vacation->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeEmployeeHolidays(EmployeeHolidays $holiday): self
+    public function removeVacation(Vacation $vacation): self
     {
-        if ($this->employeeHolidays->contains($holiday)) {
-            $this->employeeHolidays->removeElement($holiday);
+        if ($this->vacation->contains($vacation)) {
+            $this->vacation->removeElement($vacation);
             // set the owning side to null (unless already changed)
-            if ($holiday->getUser() === $this) {
-                $holiday->setUser(null);
+            if ($vacation->getUser() === $this) {
+                $vacation->setUser(null);
             }
         }
 
         return $this;
     }
 
-    public function getMorningWorkHoursFrom(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getStartMorningWorkHours()
     {
-        return $this->morning_work_hours_from;
+        return $this->start_morning_work_hours;
     }
 
-    public function setMorningWorkHoursFrom(\DateTimeInterface $morning_work_hours_from): self
+    /**
+     * @param mixed $start_morning_work_hours
+     */
+    public function setStartMorningWorkHours($start_morning_work_hours): void
     {
-        $this->morning_work_hours_from = $morning_work_hours_from;
-
-        return $this;
+        $this->start_morning_work_hours = $start_morning_work_hours;
     }
 
-    public function getMorningWorkHoursBefore(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getEndMorningWorkHours()
     {
-        return $this->morning_work_hours_before;
+        return $this->end_morning_work_hours;
     }
 
-    public function setMorningWorkHoursBefore(\DateTimeInterface $morning_work_hours_before): self
+    /**
+     * @param mixed $end_morning_work_hours
+     */
+    public function setEndMorningWorkHours($end_morning_work_hours): void
     {
-        $this->morning_work_hours_before = $morning_work_hours_before;
-
-        return $this;
+        $this->end_morning_work_hours = $end_morning_work_hours;
     }
 
-    public function getAfternoonWorkHoursFrom(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getStartAfternoonWorkHours()
     {
-        return $this->afternoon_work_hours_from;
+        return $this->start_afternoon_work_hours;
     }
 
-    public function setAfternoonWorkHoursFrom(\DateTimeInterface $afternoon_work_hours_from): self
+    /**
+     * @param mixed $start_afternoon_work_hours
+     */
+    public function setStartAfternoonWorkHours($start_afternoon_work_hours): void
     {
-        $this->afternoon_work_hours_from = $afternoon_work_hours_from;
-
-        return $this;
+        $this->start_afternoon_work_hours = $start_afternoon_work_hours;
     }
 
-    public function getAfternoonWorkHoursBefore(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getEndAfternoonWorkHours()
     {
-        return $this->afternoon_work_hours_before;
+        return $this->end_afternoon_work_hours;
     }
 
-    public function setAfternoonWorkHoursBefore(\DateTimeInterface $afternoon_work_hours_before): self
+    /**
+     * @param mixed $end_afternoon_work_hours
+     */
+    public function setEndAfternoonWorkHours($end_afternoon_work_hours): void
     {
-        $this->afternoon_work_hours_before = $afternoon_work_hours_before;
-
-        return $this;
+        $this->end_afternoon_work_hours = $end_afternoon_work_hours;
     }
+
 }

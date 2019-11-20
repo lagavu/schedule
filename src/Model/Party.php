@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="party_parties")
+ * @ORM\Table(name="party")
  */
 class Party
 {
@@ -25,22 +25,22 @@ class Party
     /**
      * @ORM\Column(type="date")
      */
-    private $party_day_from;
+    private $start_day_party;
 
     /**
      * @ORM\Column(type="date")
      */
-    private $party_day_before;
+    private $end_day_party;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $party_time_from;
+    private $start_time_party;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $party_time_before;
+    private $end_time_party;
 
     public function getId(): ?int
     {
@@ -59,51 +59,68 @@ class Party
         return $this;
     }
 
-    public function getPartyDayFrom(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getStartDayParty()
     {
-        return $this->party_day_from;
+        return $this->start_day_party;
     }
 
-    public function setPartyDayFrom(\DateTimeInterface $party_day_from): self
+    /**
+     * @param mixed $start_day_party
+     */
+    public function setStartDayParty($start_day_party): void
     {
-        $this->party_day_from = $party_day_from;
-
-        return $this;
+        $this->start_day_party = $start_day_party;
     }
 
-    public function getPartyDayBefore(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getEndDayParty()
     {
-        return $this->party_day_before;
+        return $this->end_day_party;
     }
 
-    public function setPartyDayBefore(\DateTimeInterface $party_day_before): self
+    /**
+     * @param mixed $end_day_party
+     */
+    public function setEndDayParty($end_day_party): void
     {
-        $this->party_day_before = $party_day_before;
-
-        return $this;
+        $this->end_day_party = $end_day_party;
     }
 
-    public function getPartyTimeFrom(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getStartTimeParty()
     {
-        return $this->party_time_from;
+        return $this->start_time_party;
     }
 
-    public function setPartyTimeFrom(\DateTimeInterface $party_time_from): self
+    /**
+     * @param mixed $start_time_party
+     */
+    public function setStartTimeParty($start_time_party): void
     {
-        $this->party_time_from = $party_time_from;
-
-        return $this;
+        $this->start_time_party = $start_time_party;
     }
 
-    public function getPartyTimeBefore(): ?\DateTimeInterface
+    /**
+     * @return mixed
+     */
+    public function getEndTimeParty()
     {
-        return $this->party_time_before;
+        return $this->end_time_party;
     }
 
-    public function setPartyTimeBefore(\DateTimeInterface $party_time_before): self
+    /**
+     * @param mixed $end_time_party
+     */
+    public function setEndTimeParty($end_time_party): void
     {
-        $this->party_time_before = $party_time_before;
-
-        return $this;
+        $this->end_time_party = $end_time_party;
     }
+
 }

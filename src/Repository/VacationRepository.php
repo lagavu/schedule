@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
-use App\Model\EmployeeHolidays;
+use App\Model\Vacation;
 use Doctrine\ORM\EntityManagerInterface;
 
-class EmployeeHolidaysRepository
+class VacationRepository
 {
     private $repo;
     private $connection;
@@ -13,12 +13,12 @@ class EmployeeHolidaysRepository
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->repo = $em->getRepository(EmployeeHolidays::class);
+        $this->repo = $em->getRepository(Vacation::class);
         $this->connection = $em->getConnection();
         $this->em = $em;
     }
 
-    public function userHolidays(int $userId): array
+    public function userVacation(int $userId): array
     {
         return $this->repo->findBy(['user_id' => $userId]);
     }
