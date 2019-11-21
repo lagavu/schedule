@@ -94,8 +94,8 @@
                     {% for party in parties %}
                         <tr>
                             <td>{{ party.name }}</td>
-                            <td>{{ party.startdayparty|date('Y.m.d') }} - {{ party.starttimeparty|date('H:i:s') }}</td>
-                            <td>{{ party.enddayparty|date('Y.m.d') }} - {{ party.endtimeparty|date('H:i:s') }}</td>
+                            <td>{{ party.startdayparty|date('Y.m.d') }} - {{ party.startdayparty|date('H:i:s') }}</td>
+                            <td>{{ party.enddayparty|date('Y.m.d') }} - {{ party.enddayparty|date('H:i:s') }}</td>
                         </tr>
                     {% endfor %}
                 {% endif %}

@@ -30,6 +30,4 @@ class SelectPeriod
         }
         return $requestDate;
     }
-
-
 }

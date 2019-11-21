@@ -36,9 +36,8 @@ class ScheduleController extends AbstractController
        $endDate = $request->query->get('endDate');
 
        $user = $userRepository->findUser($userId);
-       $parties = $partyRepository->getParties();
 
-       $schedule = new Schedule($user, $parties, $calendar);
+       $schedule = new Schedule($user, $partyRepository, $calendar);
        $scheduleUser = $schedule->getSchedule($startDate, $endDate);
 
         return $this->render('schedule.html.twig', [

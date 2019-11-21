@@ -4,50 +4,57 @@ namespace App\Service;
 
 use App\Model\User;
 use App\RemoteService\GoogleCalendar;
-use Carbon\Carbon;
+use App\Repository\PartyRepository;
 
 class Schedule
 {
     private $user;
-    private $parties;
+    private $partyRepository;
     private $calendar;
 
-    public function __construct(User $user, array $parties, GoogleCalendar $calendar)
+    public function __construct(User $user, PartyRepository $partyRepository, GoogleCalendar $calendar)
     {
         $this->user = $user;
-        $this->parties = $parties;
+        $this->partyRepository = $partyRepository;
         $this->calendar = $calendar;
     }
 
-    public function getSchedule(string $startDate, string $endDate): string
+    public function getSchedule(string $startDate, string $endDate)
     {
-        $schedule = $this->getWorkingDates($startDate, $endDate);
-        return $this->toJson($schedule);
-    }
+        $days = new SelectPeriod($startDate, $endDate);
+        $days = $this->removeHoliday($days, $holidays);
+        $days = $this->removeVacation($days);
+        $days = $this->removeWeekends($days);
 
-    private function getWorkingDates(string $startDate, string $endDate): array
-    {
+
+
         $user = $this->user;
-        $parties = $this->parties;
+        $partyRepository = $this->partyRepository;
 
         $selectPeriod = new SelectPeriod($startDate, $endDate);
         $vacation = new Vacation($user);
-        $partiesCompany = new PartiesCompany($parties);
+        $partiesCompany = new PartiesCompany($user, $partyRepository, $selectPeriod);
         $weekend = new Weekend($startDate, $endDate);
 
-        return array_diff(
-            $selectPeriod->makeDatesRange(),
-            $vacation->removeVacationDates(),
-            $this->calendar->removeHolidaysRussiaDates(),
-            $partiesCompany->removeCompanyPartiesDates(),
-            $weekend->removeWeekendDates()
+        $scheduleWithoutPartyDays = array_diff(
+            $datesRange,
+            $vacation->getVacationDates(),
+            $this->calendar->getHolidaysRussiaDates(),
+            $partiesCompany->getCompanyPartiesDates(),
+            $weekend->getWeekendDates()
         );
+
+        $schedule = $partiesCompany->addFirstDayPartyInSchedule($scheduleWithoutPartyDays);
+
+        return $this->toJson($schedule, $partiesCompany);
     }
 
+    private function removeHolidays(array $days, array $holidays): array
+    {
+        return array_diff($days, $holidays);
+    }
 
-
-
-    private function toJson(array $schedule): string
+    private function toJson($schedule, $partiesCompany): string
     {
         $userWorkTime = [
             [
@@ -59,14 +66,15 @@ class Schedule
                 'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
             ]
         ];
-        $combineWorkDateAndTime = array_map(function($userWorkDay) use ($userWorkTime)
+
+        $combineWorkDateAndTime = array_map(function($userWorkDay) use ($userWorkTime, $partiesCompany)
         {
-            $a = $this->getPartiesDatesFromRequestToCheck($userWorkDay);
             return [
-                'day' => $this->getPartiesDatesFromRequestToCheck($userWorkDay),
-                'timeRangers' => $this->getWorkingTimeIfParty($a, $userWorkTime)
+                'day' => $userWorkDay,
+                'timeRangers' => $partiesCompany->checkWorkingTimeWhenParty($userWorkDay, $userWorkTime)
             ];
         }, $schedule);
+
         $combineSchedule = [
             'schedule' => $combineWorkDateAndTime
         ];
@@ -74,61 +82,4 @@ class Schedule
         return json_encode($combineSchedule, JSON_PRETTY_PRINT);
     }
 
-    private function getPartiesDatesFromRequestToCheck(string $userWorkDay)
-    {
-        $DateParty = [];
-
-        foreach ($this->parties as $party)
-        {
-            for ($i=0; $i < count($this->parties); $i++)
-                $DateParty = [
-                    $party->getStartDayParty()->Format('Y-m-d'),
-                    $party->getStartTimeParty()->Format('H:i:s')
-                ];
-            if ($userWorkDay === $DateParty['0']) {
-                $userWorkDay = $DateParty;
-            }
-        }
-        return $userWorkDay;
-    }
-
-    private function getWorkingTimeIfParty($userWorkDay, $userWorkTime): array
-    {
-        foreach ($userWorkTime as $workTimeSeparation)
-        {
-            if ($this->checkMorningPartyTime( $userWorkDay, $workTimeSeparation))
-            {
-                $userWorkTime = [
-                    ['start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
-                       'end' => $userWorkDay['1']],
-                ];
-                return $userWorkTime;
-                break;
-            }
-            elseif ($this->checkAfternoonPartyTime($userWorkDay, $userWorkTime))
-            {
-                $userWorkTime = [
-                    ['start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
-                       'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')],
-                    ['start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
-                       'end' => $userWorkDay['1']]
-                ];
-                return $userWorkTime;
-                break;
-            }
-        }
-        return $userWorkTime;
-    }
-
-    private function checkMorningPartyTime($userWorkDay, $workTimeSeparation): bool
-    {
-       return $userWorkDay['1'] < $workTimeSeparation['end']
-              && $userWorkDay['1'] > $workTimeSeparation['start']
-              && $this->user->getEndMorningWorkHours()->Format('H:i:s') > $userWorkDay['1'];
-    }
-
-    private function checkAfternoonPartyTime($userWorkDay, $userWorkTime): bool
-    {
-        return $userWorkDay['1'] < $userWorkTime[1]['end'] && $userWorkDay['1'] > $userWorkTime[1]['start'];
-    }
 }
