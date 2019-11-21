@@ -23,24 +23,14 @@ class Party
     private $name;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      */
     private $start_day_party;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="datetime")
      */
     private $end_day_party;
-
-    /**
-     * @ORM\Column(type="time")
-     */
-    private $start_time_party;
-
-    /**
-     * @ORM\Column(type="time")
-     */
-    private $end_time_party;
 
     public function getId(): ?int
     {
@@ -89,37 +79,5 @@ class Party
     public function setEndDayParty($end_day_party): void
     {
         $this->end_day_party = $end_day_party;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getStartTimeParty()
-    {
-        return $this->start_time_party;
-    }
-
-    /**
-     * @param mixed $start_time_party
-     */
-    public function setStartTimeParty($start_time_party): void
-    {
-        $this->start_time_party = $start_time_party;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEndTimeParty()
-    {
-        return $this->end_time_party;
-    }
-
-    /**
-     * @param mixed $end_time_party
-     */
-    public function setEndTimeParty($end_time_party): void
-    {
-        $this->end_time_party = $end_time_party;
     }
 }
