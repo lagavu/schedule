@@ -27,93 +27,25 @@ class Schedule
 
     private function getWorkingDates(string $startDate, string $endDate): array
     {
-        dd(
-            $this->makeDatesRange($startDate, $endDate),
-            $this->getUserVacationDates(),
-            $this->calendar->getHolidaysRussia(),
-            $this->getCompanyPartiesDates(),
-            $this->removeWeekendFromRequestDates($startDate, $endDate),
-            array_diff(
-                $this->makeRequestDateRange($startDate, $endDate),
-                $this->getUserVacationDates(),
-                $this->calendar->getHolidaysRussia(),
-                $this->getCompanyPartiesDates(),
-                $this->removeWeekendFromRequestDates($startDate, $endDate)
+        $user = $this->user;
+        $parties = $this->parties;
 
-        ));
+        $selectPeriod = new SelectPeriod($startDate, $endDate);
+        $vacation = new Vacation($user);
+        $partiesCompany = new PartiesCompany($parties);
+        $weekend = new Weekend($startDate, $endDate);
+
         return array_diff(
-            $this->makeDatesRange($startDate, $endDate),
-            $this->getUserVacationDates(),
-            $this->calendar->getHolidaysRussia(),
-            $this->getCompanyPartiesDates(),
-            $this->removeWeekendFromRequestDates($startDate, $endDate));
+            $selectPeriod->makeDatesRange(),
+            $vacation->removeVacationDates(),
+            $this->calendar->removeHolidaysRussiaDates(),
+            $partiesCompany->removeCompanyPartiesDates(),
+            $weekend->removeWeekendDates()
+        );
     }
 
-    private function makeDatesRange(string $startDate, string $endDate): array
-    {
-        $requestDate = [];
-        $startDateCarbon = new Carbon($startDate);
-        $endDateCarbon = new Carbon($endDate);
 
-        while ($startDateCarbon->lte($endDateCarbon)) {
-            $requestDate[] = $startDateCarbon->toDateString();
-            $startDateCarbon->addDay();
-        }
-        return $requestDate;
-    }
 
-    private function getUserVacationDates(): array
-    {
-        $vacationsDate = [];
-        $vacations = $this->user->getVacation()->toArray();
-
-        for ($i = 0; $i < $this->user->getVacation()->count(); $i++)
-        {
-            $start = new Carbon($vacations[$i]->getStartVacation()->format('Y-m-d'));
-            $end = new Carbon($vacations[$i]->getEndVacation()->format('Y-m-d'));
-
-            while ($start->lte($end)) {
-                $vacationsDate[] = $start->toDateString();
-                $start->addDay();
-            }
-        }
-        return $vacationsDate;
-    }
-
-    private function getCompanyPartiesDates(): array
-    {
-        $partiesDate = [];
-        $allPartyCompany = $this->parties;
-
-        for ($i = 0; $i < count($allPartyCompany); $i++) {
-
-            $startDateParty = new Carbon($allPartyCompany[$i]->getStartDayParty()->format('Y-m-d'));
-            $endDateParty = new Carbon($allPartyCompany[$i]->getEndDayParty()->format('Y-m-d'));
-
-            while ($startDateParty->lte($endDateParty)) {
-                $partiesDate[] = $startDateParty->toDateString();
-                $startDateParty->addDay();
-            }
-        }
-        return $partiesDate;
-    }
-
-    private function removeWeekendFromRequestDates(string $startDate, string $endDate): array
-    {
-        $startDateUnixTime = strtotime($startDate);
-        $endDateUnixTime = strtotime($endDate);
-        $excludeWeekendRequest = [];
-
-        while ($startDateUnixTime <= $endDateUnixTime)
-        {
-            if (date('N', $startDateUnixTime) >= 6)
-            {
-                $currentDate = date('Y-m-d', $startDateUnixTime);
-                $excludeWeekendRequest[] = $currentDate;
-            } $startDateUnixTime += 86400;
-        }
-        return $excludeWeekendRequest;
-    }
 
     private function toJson(array $schedule): string
     {
@@ -135,7 +67,9 @@ class Schedule
                 'timeRangers' => $this->getWorkingTimeIfParty($a, $userWorkTime)
             ];
         }, $schedule);
-        $combineSchedule = ['schedule' => $combineWorkDateAndTime];
+        $combineSchedule = [
+            'schedule' => $combineWorkDateAndTime
+        ];
 
         return json_encode($combineSchedule, JSON_PRETTY_PRINT);
     }
