@@ -20,28 +20,21 @@ class Schedule
         $this->calendar = $calendar;
     }
 
-    public function getSchedule(string $startDate, string $endDate)
+    public function getSchedule(\DateTime $startDate, \DateTime $endDate)
     {
-        $rangeDays = $this->makeDatesRange($startDate, $endDate);
-        $holidaysRussiaDays = $this->calendar->getHolidaysRussiaDates();
-        $weekendDays = $this->getWeekendDates($startDate, $endDate);
+        $allDays = Days::fromRange($startDate, $endDate);
+        $holidays = $this->calendar->getHolidaysRussiaDates();
+        $weekend = $this->getWeekendDates($startDate, $endDate);
         $vacation = $this->getVacationDates($this->user);
 
-        $days = new Days($rangeDays);
-        $holidays = new Days($holidaysRussiaDays);
-        $weekend = new Days($weekendDays);
+        $workingDays = $allDays
+            ->remove($holidays)
+            ->remove($weekend)
+            ->remove($vacation);
 
-        $daysWithoutHolidays = $days->remove($holidays);
-        $rangeDaysWithoutVacation = $daysWithoutHolidays->remove($weekend);
-        $rangeDaysWithoutWeekend = $rangeDaysWithoutVacation->remove($vacation);
-
-
-dd($rangeDaysWithoutWeekend);
-
-
-        return $this->toJson($schedule, $partiesCompany);
+dd($workingDays);
+        return $this->toJson($workingDays, $partiesCompany);
     }
-
 
     public function getVacationDates(User $user): Days
     {
@@ -54,49 +47,22 @@ dd($rangeDaysWithoutWeekend);
         return $allVacationDays;
     }
 
-
-    public function getWeekendDates($startDate, $endDate): array
+    public function getWeekendDates(\DateTime $startDate, \DateTime $endDate): Days
     {
-        $startDateUnixTime = strtotime($startDate);
-        $endDateUnixTime = strtotime($endDate);
-        $excludeWeekendRequest = [];
+        $startDateUnixTime = strtotime($startDate->format('Y-m-d'));
+        $endDateUnixTime = strtotime($endDate->format('Y-m-d'));
+        $excludeWeekend = [];
 
         while ($startDateUnixTime <= $endDateUnixTime)
         {
             if (date('N', $startDateUnixTime) >= 6)
             {
                 $currentDate = date('Y-m-d', $startDateUnixTime);
-                $excludeWeekendRequest[] = $currentDate;
+                $excludeWeekend[] = $currentDate;
             } $startDateUnixTime += 86400;
         }
-        return $excludeWeekendRequest;
+        return new Days($excludeWeekend);
     }
-
-
-    public function makeDatesRange($startDate, $endDate): array
-    {
-        $dates = [];
-        $startDateCarbon = new Carbon($startDate);
-        $endDateCarbon = new Carbon($endDate);
-
-        while ($startDateCarbon->lte($endDateCarbon)) {
-            $dates[] = $startDateCarbon->toDateString();
-            $startDateCarbon->addDay();
-        }
-        return $dates;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
     private function toJson($schedule, $partiesCompany): string
     {
@@ -125,7 +91,6 @@ dd($rangeDaysWithoutWeekend);
 
         return json_encode($combineSchedule, JSON_PRETTY_PRINT);
     }
-
 
     public function removeCompanyPartiesDates(): array
     {
@@ -192,5 +157,4 @@ dd($rangeDaysWithoutWeekend);
         }
         return $userWorkTime;
     }
-
 }

@@ -6,6 +6,7 @@ use App\RemoteService\GoogleCalendar;
 use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
 use App\Service\Schedule;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,14 +27,15 @@ class ScheduleController extends AbstractController
 
     /**
      * @Route("schedule", name="schedule", methods={"GET"})
+     * @throws Exception
      */
     public function schedule(
         Request $request, PartyRepository $partyRepository,
         UserRepository $userRepository, GoogleCalendar $calendar): Response
     {
        $userId = $request->query->get('userId');
-       $startDate = $request->query->get('startDate');
-       $endDate = $request->query->get('endDate');
+       $startDate = new \DateTime($request->query->get('startDate'));
+       $endDate = new \DateTime($request->query->get('endDate'));
 
        $user = $userRepository->findUser($userId);
 

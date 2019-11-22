@@ -2,20 +2,21 @@
 
 namespace App\RemoteService;
 
+use App\Service\Days;
+
 class GoogleCalendar
 {
     private const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3/calendars/russian__ru%40holiday.calendar.google.com/events?key=AIzaSyC8khrJO57yl4szjLOuyQrlW7R_CKgwaH0';
 
-
-
-
-    public function getHolidaysRussiaDates(): array
+    public function getHolidaysRussiaDates(): Days
     {
         $datesHolidaysRussia = GoogleCalendar::getDatesHolidaysRussia();
         $currentYearHolidaysRussia = array_filter($datesHolidaysRussia, function ($var) {
             return substr($var, 0, 4) === date("Y");
         });
-        return $currentYearHolidaysRussia;
+        $holidaysDays = new Days($currentYearHolidaysRussia);
+
+        return $holidaysDays;
     }
 
     public function getHolidaysRussiaDateAndName(): array

@@ -32,15 +32,14 @@ class Days
 
     public static function fromRange(\DateTime $startDate, \DateTime $endDate): Days
     {
-        $vacationsDate = [];
+        $datesRange = [];
+        $startDate = new Carbon($startDate->format('Y-m-d'));
+        $endDate = new Carbon($endDate->format('Y-m-d'));
 
-        $start = new Carbon($startDate->format('Y-m-d'));
-        $end = new Carbon($endDate->format('Y-m-d'));
-
-        while ($start->lte($end)) {
-            $vacationsDate[] = $start->toDateString();
-            $start->addDay();
+        while ($startDate->lte($endDate)) {
+            $datesRange[] = $startDate->toDateString();
+            $startDate->addDay();
         }
-        return new self($vacationsDate);
+        return new self($datesRange);
     }
 }
