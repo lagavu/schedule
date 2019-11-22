@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Service;
-
 
 use Carbon\Carbon;
 
@@ -13,11 +11,6 @@ class Days
     public function __construct(array $rangeDays)
     {
         $this->rangeDays = $rangeDays;
-    }
-
-    public function getDays(): array
-    {
-        return $this->rangeDays;
     }
 
     public function remove(Days $days): Days
@@ -41,5 +34,10 @@ class Days
             $startDate->addDay();
         }
         return new self($datesRange);
+    }
+
+    private function getDays(): array
+    {
+        return $this->rangeDays;
     }
 }

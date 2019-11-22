@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Welcome!{% endblock %}</title>
+    <title>{% block title %}Schedule{% endblock %}</title>
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
     {% endblock %}
@@ -16,52 +16,48 @@
     <hr>
         <h2>Расписание работника компании</h2>
     <br>
-    <hr>
+        <hr>
     <br>
-    <form method="get"  action="schedule">
-        <div class="row  align-items-end">
-            <div class="form-group col">
-                <label>ID user</label>
-
-                <input type="text" name="userId" class="form-control" placeholder="Name" value="" id="userId">
+        <form method="get"  action="schedule">
+            <div class="row  align-items-end">
+                <div class="form-group col">
+                    <label>ID user</label>
+                    <input type="text" name="userId" class="form-control" placeholder="Name" value="" id="userId">
+                </div>
+                <div class="form-group col">
+                    <label>Дата, от</label>
+                    <input type="date" name="startDate" class="form-control" value="" id="startDate">
+                </div>
+                <div class="form-group col">
+                    <label>Дата, до</label>
+                    <input type="date" name="endDate" class="form-control" value="" id="endDate">
+                </div>
+                <div class="form-group col">
+                    <button class="btn btn-success btn-submit">Расчитать</button>
+                </div>
             </div>
-            <div class="form-group col">
-                <label>Дата, от</label>
-                <input type="date" name="startDate" class="form-control" value="" id="startDate">
-            </div>
-            <div class="form-group col">
-                <label>Дата, до</label>
-                <input type="date" name="endDate" class="form-control" value="" id="endDate">
-            </div>
-            <div class="form-group col">
-                <button class="btn btn-success btn-submit">Расчитать</button>
-            </div>
-        </div>
-    </form>
-
+        </form>
     <br>
     <br>
-    <hr>
+        <hr>
     <br>
     <div class="row">
         <div class="col-6">
             <h5 class="font-weight-bolder">Информация о работнике:</h5>
             <table class="table mt-5">
-                <thead>
-                </thead>
                 <tbody>
                 {% if user is defined %}
                     <tr>
-                        <td scope="row">IdUser</td>
+                        <td class="row">IdUser</td>
                         <td>{{ user.id }}</td>
                     </tr>
                     <tr>
-                        <td scope="row">График работы:</td>
+                        <td class="row">График работы:</td>
                         <td>c {{ user.startmorningworkhours|date('H:i:s') }} до {{ user.endmorningworkhours|date('H:i:s') }} <br>
                             c {{ user.startafternoonworkhours|date('H:i:s') }} до {{ user.endafternoonworkhours|date('H:i:s') }}
                         </td>
                     </tr>
-                <td scope="row">Отпуск:</td>
+                <td class="row">Отпуск:</td>
                 {% if vacations  is defined %}
                         {% for vacation in vacations %}
                             <tr>

@@ -20,5 +20,4 @@ class PartyRepository
     {
         return $this->repository->findAll();
     }
-
 }

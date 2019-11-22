@@ -20,23 +20,87 @@ class Schedule
         $this->calendar = $calendar;
     }
 
-    public function getSchedule(\DateTime $startDate, \DateTime $endDate)
+    public function getSchedule(\DateTime $startDate, \DateTime $endDate): string
     {
         $allDays = Days::fromRange($startDate, $endDate);
-        $holidays = $this->calendar->getHolidaysRussiaDates();
-        $weekend = $this->getWeekendDates($startDate, $endDate);
-        $vacation = $this->getVacationDates($this->user);
+        $holidays = $this->calendar->getHolidays();
+        $weekend = $this->getWeekendDays($startDate, $endDate);
+        $vacation = $this->getVacationDays($this->user);
 
         $workingDays = $allDays
             ->remove($holidays)
             ->remove($weekend)
             ->remove($vacation);
 
-dd($workingDays);
-        return $this->toJson($workingDays, $partiesCompany);
+        $schedule = $this->addWorkingTime(array_values((array)$workingDays));
+
+        return json_encode($schedule, JSON_PRETTY_PRINT);
     }
 
-    public function getVacationDates(User $user): Days
+    private function addWorkingTime(array $workingDays): array
+    {
+        $WorkTime = [
+            [
+                'start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
+                'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')
+            ],
+            [
+                'start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
+                'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
+            ]
+        ];
+        return ['schedule' => array_map(function($WorkDay) use ($WorkTime)
+        {
+            return [
+                'day' => $WorkDay,
+                'timeRangers' => $WorkTime
+            ];
+        }, $workingDays[0])];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+    private function addWorkingTime($workingDays): array
+    {
+        return ['schedule' => array_map(function($WorkDay) use ()
+        {
+            return [
+                'day' => $WorkDay,
+                'timeRangers' => [
+                    [
+                        'start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
+                        'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')
+                    ],
+                    [
+                        'start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
+                        'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
+                    ]
+                ]
+            ];
+        }, $workingDays[0])];
+    }
+
+    $this->checkWorkingTimeWhenParty($WorkDay, $WorkTime)
+*/
+
+
+
+
+
+
+    private function getVacationDays(User $user): Days
     {
         $allVacationDays = new Days([]);
 
@@ -47,52 +111,24 @@ dd($workingDays);
         return $allVacationDays;
     }
 
-    public function getWeekendDates(\DateTime $startDate, \DateTime $endDate): Days
+    private function getWeekendDays(\DateTime $startDate, \DateTime $endDate): Days
     {
         $startDateUnixTime = strtotime($startDate->format('Y-m-d'));
         $endDateUnixTime = strtotime($endDate->format('Y-m-d'));
-        $excludeWeekend = [];
+        $weekend = [];
 
         while ($startDateUnixTime <= $endDateUnixTime)
         {
             if (date('N', $startDateUnixTime) >= 6)
             {
                 $currentDate = date('Y-m-d', $startDateUnixTime);
-                $excludeWeekend[] = $currentDate;
+                $weekend[] = $currentDate;
             } $startDateUnixTime += 86400;
         }
-        return new Days($excludeWeekend);
+        return new Days($weekend);
     }
 
-    private function toJson($schedule, $partiesCompany): string
-    {
-        $userWorkTime = [
-            [
-                'start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
-                'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')
-            ],
-            [
-                'start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
-                'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
-            ]
-        ];
-
-        $combineWorkDateAndTime = array_map(function($userWorkDay) use ($userWorkTime, $partiesCompany)
-        {
-            return [
-                'day' => $userWorkDay,
-                'timeRangers' => $partiesCompany->checkWorkingTimeWhenParty($userWorkDay, $userWorkTime)
-            ];
-        }, $schedule);
-
-        $combineSchedule = [
-            'schedule' => $combineWorkDateAndTime
-        ];
-
-        return json_encode($combineSchedule, JSON_PRETTY_PRINT);
-    }
-
-    public function removeCompanyPartiesDates(): array
+    private function removeCompanyPartiesDays(): array
     {
         $partiesDate = [];
         $allPartyCompany = $this->parties;
@@ -110,22 +146,22 @@ dd($workingDays);
         return $partiesDate;
     }
 
-    public function addFirstDayPartyInSchedule($scheduleWithoutPartyDays)
+    private function addFirstDayPartyInSchedule($scheduleWithoutPartyDays)
     {
-        $firstDatesParty = [];
+        $firstDaysParty = [];
         foreach ($this->parties as $party)
         {
-            $firstDatesParty[] = $party->getStartDayParty()->Format('Y-m-d');
+            $firstDaysParty[] = $party->getStartDayParty()->Format('Y-m-d');
         }
-        $datesMerge = array_merge($scheduleWithoutPartyDays, $firstDatesParty);
-        asort($datesMerge);
+        $DaysMerge = array_merge($scheduleWithoutPartyDays, $firstDaysParty);
+        asort($DaysMerge);
 
-        return $datesMerge;
+        return $DaysMerge;
     }
 
-    public function checkWorkingTimeWhenParty($userWorkDay, $userWorkTime)
+    private function checkWorkingTimeWhenParty($userWorkDay, $userWorkTime)
     {
-        foreach ($this->parties as $party)
+        foreach ($this->partyRepository->getParties() as $party)
         {
             if ($userWorkDay === $party->getStartDayParty()->Format('Y-m-d'))
             {

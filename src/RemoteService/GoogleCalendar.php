@@ -8,32 +8,32 @@ class GoogleCalendar
 {
     private const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3/calendars/russian__ru%40holiday.calendar.google.com/events?key=AIzaSyC8khrJO57yl4szjLOuyQrlW7R_CKgwaH0';
 
-    public function getHolidaysRussiaDates(): Days
+    public function getHolidays(): Days
     {
-        $datesHolidaysRussia = GoogleCalendar::getDatesHolidaysRussia();
-        $currentYearHolidaysRussia = array_filter($datesHolidaysRussia, function ($var) {
+        $datesHolidays = GoogleCalendar::getDatesHolidays();
+        $currentYearHolidays = array_filter($datesHolidays, function ($var) {
             return substr($var, 0, 4) === date("Y");
         });
-        $holidaysDays = new Days($currentYearHolidaysRussia);
+        $holidaysDays = new Days($currentYearHolidays);
 
         return $holidaysDays;
     }
 
-    public function getHolidaysRussiaDateAndName(): array
+    public function getHolidaysDateAndName(): array
     {
-        $countHolidaysRussia = GoogleCalendar::countHolidaysRussia();
-        $datesHolidaysRussia = GoogleCalendar::getDatesHolidaysRussia();
-        $nameHolidaysRussia = GoogleCalendar::getNameHolidaysRussia();
-        $holidaysRussiaDateAndName = [];
+        $countHolidays = GoogleCalendar::countHolidays();
+        $datesHolidays = GoogleCalendar::getDatesHolidays();
+        $nameHolidays = GoogleCalendar::getNameHolidays();
+        $holidaysDateAndName = [];
 
-        for ($i = 0; $i < $countHolidaysRussia; $i++)
+        for ($i = 0; $i < $countHolidays; $i++)
         {
-            $holidaysRussiaDateAndName[] = [
-                "date" => $datesHolidaysRussia[$i],
-                "name_holiday" => $nameHolidaysRussia[$i]
+            $holidaysDateAndName[] = [
+                "date" => $datesHolidays[$i],
+                "name_holiday" => $nameHolidays[$i]
             ];
         }
-        return $holidaysRussiaDateAndName;
+        return $holidaysDateAndName;
     }
 
     private static function googleCalendarApi(): array
@@ -41,39 +41,36 @@ class GoogleCalendar
         return json_decode(file_get_contents(self::GOOGLE_CALENDAR_API), true);
     }
 
-    private static function countHolidaysRussia(): int
+    private static function countHolidays(): int
     {
-        $countHolidaysRussia = GoogleCalendar::googleCalendarApi();
-        return count($countHolidaysRussia['items']);
+        $countHolidays = GoogleCalendar::googleCalendarApi();
+        return count($countHolidays['items']);
     }
 
-    private static function getDatesHolidaysRussia(): array
-    {
-        $itemsGoogleCalendarApi = GoogleCalendar::googleCalendarApi();
-        $countHolidaysRussia = GoogleCalendar::countHolidaysRussia();
-        $datesHolidaysRussia = [];
-
-        for ($i=0; $i < $countHolidaysRussia; $i++)
-        {
-            $datesHolidaysRussia[] = $itemsGoogleCalendarApi['items'][$i]['start']['date'];
-        };
-
-        return $datesHolidaysRussia;
-    }
-
-    private static function getNameHolidaysRussia(): array
+    private static function getDatesHolidays(): array
     {
         $itemsGoogleCalendarApi = GoogleCalendar::googleCalendarApi();
-        $countHolidaysRussia = GoogleCalendar::countHolidaysRussia();
-        $nameHolidaysRussia = [];
+        $countHolidays = GoogleCalendar::countHolidays();
+        $datesHolidays = [];
 
-        for ($i=0; $i < $countHolidaysRussia; $i++)
+        for ($i=0; $i < $countHolidays; $i++)
         {
-            $nameHolidaysRussia[] = $itemsGoogleCalendarApi['items'][$i]['summary'];
+            $datesHolidays[] = $itemsGoogleCalendarApi['items'][$i]['start']['date'];
         };
-        return $nameHolidaysRussia;
+
+        return $datesHolidays;
     }
 
+    private static function getNameHolidays(): array
+    {
+        $itemsGoogleCalendarApi = GoogleCalendar::googleCalendarApi();
+        $countHolidays = GoogleCalendar::countHolidays();
+        $nameHolidays = [];
 
-
+        for ($i=0; $i < $countHolidays; $i++)
+        {
+            $nameHolidays[] = $itemsGoogleCalendarApi['items'][$i]['summary'];
+        };
+        return $nameHolidays;
+    }
 }

@@ -47,7 +47,7 @@ class ScheduleController extends AbstractController
             'user' => $user,
             'vacations' => $user->getVacation()->toArray(),
             'parties' => $partyRepository->getParties(),
-            'calendar' => $calendar->getHolidaysRussiaDateAndName(),
+            'calendar' => $calendar->getHolidaysDateAndName(),
             'year' => date('Y'),
         ]);
     }
