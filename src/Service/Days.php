@@ -16,19 +16,29 @@ class Days
         $this->rangeDays = $rangeDays;
     }
 
-    public function remove(array $arr): Days
+    public function getDays(): array
+    {
+        return $this->rangeDays;
+    }
+
+    public function remove(Days $days): Days
     {
 
-        return new Days(array_diff($this->rangeDays, $arr));
+        return new Days(array_diff($this->getDays(), $days->getDays()));
     }
+
 
     public function add(Days $days): Days
     {
+        $rangeDays = array_merge($days->getDays(), $this->getDays());
+        return new Days($rangeDays);
 
-        return new Days(array_merge($this->rangeDays, $days));
     }
 
-    public static function fromRange($startDate, $endDate)
+
+
+
+    public static function fromRange(\DateTime $startDate, \DateTime $endDate)
     {
         $vacationsDate = [];
 

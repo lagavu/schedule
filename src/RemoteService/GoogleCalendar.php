@@ -6,6 +6,9 @@ class GoogleCalendar
 {
     private const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3/calendars/russian__ru%40holiday.calendar.google.com/events?key=AIzaSyC8khrJO57yl4szjLOuyQrlW7R_CKgwaH0';
 
+
+
+
     public function getHolidaysRussiaDates(): array
     {
         $datesHolidaysRussia = GoogleCalendar::getDatesHolidaysRussia();

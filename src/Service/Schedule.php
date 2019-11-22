@@ -28,17 +28,20 @@ class Schedule
         $days = new Days($rangeDays);
 
 
+dd($holidaysDate);
+
+
         $rangeDaysWithoutHolidays = $days->remove($holidaysDate);
         $rangeDaysWithoutVacation = $rangeDaysWithoutHolidays->remove($this->getWeekendDates($startDate, $endDate));
 
 
-        dd($rangeDaysWithoutVacation, $this->getVacationDates($this->user));
-
-
-        $rangeDaysWithoutWeekend = $rangeDaysWithoutVacation->remove($this->getWeekendDates($startDate, $endDate));
 
 
 
+        $rangeDaysWithoutWeekend = $rangeDaysWithoutVacation->remove($this->getVacationDates($this->user));
+
+
+dd($rangeDaysWithoutWeekend);
 
 
 
@@ -89,9 +92,19 @@ dd($rangeDaysWithoutWeekend);
     }
 
 
+    public function getVacationDates(User $user): Days
+    {
+        $allVacationDays = new Days([]);
+
+        foreach ($user->getVacation() as $vacation) {
+
+            $vacationDays = Days::fromRange($vacation->getStartVacation(), $vacation->getEndVacation());
+            $allVacationDays = $allVacationDays->add($vacationDays);
+        }
 
 
-
+        return $allVacationDays;
+    }
 
 
 
@@ -115,18 +128,7 @@ dd($rangeDaysWithoutWeekend);
         return $excludeWeekendRequest;
     }
 
-    public function getVacationDates(User $user): Days
-    {
-        $allVacationDays = new Days([]);
 
-        foreach ($user->getVacation() as $vacation) {
-
-            $vacationDays = Days::fromRange($vacation->getStartVacation(), $vacation->getEndVacation());
-            $allVacationDays->add($vacationDays);
-        }
-dd($allVacationDays);
-        return $allVacationDays;
-    }
 
 
 
