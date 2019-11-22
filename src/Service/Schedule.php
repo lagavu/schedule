@@ -23,70 +23,21 @@ class Schedule
     public function getSchedule(string $startDate, string $endDate)
     {
         $rangeDays = $this->makeDatesRange($startDate, $endDate);
-        $holidaysDate = $this->calendar->getHolidaysRussiaDates();
+        $holidaysRussiaDays = $this->calendar->getHolidaysRussiaDates();
+        $weekendDays = $this->getWeekendDates($startDate, $endDate);
+        $vacation = $this->getVacationDates($this->user);
 
         $days = new Days($rangeDays);
+        $holidays = new Days($holidaysRussiaDays);
+        $weekend = new Days($weekendDays);
 
-
-dd($holidaysDate);
-
-
-        $rangeDaysWithoutHolidays = $days->remove($holidaysDate);
-        $rangeDaysWithoutVacation = $rangeDaysWithoutHolidays->remove($this->getWeekendDates($startDate, $endDate));
-
-
-
-
-
-        $rangeDaysWithoutWeekend = $rangeDaysWithoutVacation->remove($this->getVacationDates($this->user));
+        $daysWithoutHolidays = $days->remove($holidays);
+        $rangeDaysWithoutVacation = $daysWithoutHolidays->remove($weekend);
+        $rangeDaysWithoutWeekend = $rangeDaysWithoutVacation->remove($vacation);
 
 
 dd($rangeDaysWithoutWeekend);
 
-
-
-        $scheduleWithoutPartyDays = array_diff(
-            $datesRange,
-            $vacation->getVacationDates(),
-            $this->calendar->getHolidaysRussiaDates(),
-            $partiesCompany->getCompanyPartiesDates(),
-            $weekend->getWeekendDates()
-        );
-
-
-
-
-
-
-dd($rangeDaysWithoutWeekend);
-
-
-
-        dd($days->getVacationDates($this->user),
-        $days->getWeekendDates($startDate, $endDate));
-
-
-
-
-
-        $days = new SelectPeriod($startDate, $endDate);
-        $days = $this->removeHoliday($days, $holidays);
-        $days = $this->removeVacation($days);
-        $days = $this->removeWeekends($days);
-
-
-
-        $user = $this->user;
-        $partyRepository = $this->partyRepository;
-
-        $selectPeriod = new SelectPeriod($startDate, $endDate);
-        $vacation = new Vacation($user);
-        $partiesCompany = new PartiesCompany($user, $partyRepository, $selectPeriod);
-        $weekend = new Weekend($startDate, $endDate);
-
-
-
-        $schedule = $partiesCompany->addFirstDayPartyInSchedule($scheduleWithoutPartyDays);
 
         return $this->toJson($schedule, $partiesCompany);
     }
@@ -97,18 +48,11 @@ dd($rangeDaysWithoutWeekend);
         $allVacationDays = new Days([]);
 
         foreach ($user->getVacation() as $vacation) {
-
             $vacationDays = Days::fromRange($vacation->getStartVacation(), $vacation->getEndVacation());
             $allVacationDays = $allVacationDays->add($vacationDays);
         }
-
-
         return $allVacationDays;
     }
-
-
-
-
 
 
     public function getWeekendDates($startDate, $endDate): array
@@ -129,44 +73,25 @@ dd($rangeDaysWithoutWeekend);
     }
 
 
-
-
-
-
-
-
-
-
-
-
-    private function getWorkingDates(string $startDate, string $endDate): array
-    {
-        return array_diff(
-            $this->makeDatesRange($startDate, $endDate),
-            $this->getUserVacationDates(),
-            $this->calendar->getHolidaysRussia(),
-            $this->getCompanyPartiesDates(),
-            $this->removeWeekendFromRequestDates($startDate, $endDate));
-    }
-
-
-
-
-
-
-
     public function makeDatesRange($startDate, $endDate): array
     {
-        $requestDate = [];
+        $dates = [];
         $startDateCarbon = new Carbon($startDate);
         $endDateCarbon = new Carbon($endDate);
 
         while ($startDateCarbon->lte($endDateCarbon)) {
-            $requestDate[] = $startDateCarbon->toDateString();
+            $dates[] = $startDateCarbon->toDateString();
             $startDateCarbon->addDay();
         }
-        return $requestDate;
+        return $dates;
     }
+
+
+
+
+
+
+
 
 
 
