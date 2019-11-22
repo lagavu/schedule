@@ -49,13 +49,16 @@ class Schedule
                 'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
             ]
         ];
-        return ['schedule' => array_map(function($WorkDay) use ($WorkTime)
+
+        $x = ['schedule' => array_map(function($WorkDay) use ($WorkTime)
         {
             return [
                 'day' => $WorkDay,
                 'timeRangers' => $WorkTime
             ];
         }, $workingDays[0])];
+
+        return $x;
     }
 
 
