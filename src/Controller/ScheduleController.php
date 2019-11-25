@@ -6,6 +6,10 @@ use App\RemoteService\GoogleCalendar;
 use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
 use App\Service\Schedule;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use DateInterval;
+use DatePeriod;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,8 +38,9 @@ class ScheduleController extends AbstractController
         UserRepository $userRepository, GoogleCalendar $calendar): Response
     {
        $userId = $request->query->get('userId');
-       $startDate = new \DateTime($request->query->get('startDate'));
-       $endDate = new \DateTime($request->query->get('endDate'));
+       $startDate = Carbon::create($request->query->get('startDate'));
+       $endDate = Carbon::create($request->query->get('endDate'));
+
 
        $user = $userRepository->findUser($userId);
 

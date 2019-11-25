@@ -36,7 +36,7 @@ class Days
         return new self($datesRange);
     }
 
-    private function getDays(): array
+    public function getDays(): array
     {
         return $this->rangeDays;
     }

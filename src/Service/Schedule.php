@@ -27,39 +27,86 @@ class Schedule
         $weekend = $this->getWeekendDays($startDate, $endDate);
         $vacation = $this->getVacationDays($this->user);
 
-        $workingDays = $allDays
+        $workingSchedule = $allDays
             ->remove($holidays)
             ->remove($weekend)
             ->remove($vacation);
 
-        $schedule = $this->addWorkingTime(array_values((array)$workingDays));
 
-        return json_encode($schedule, JSON_PRETTY_PRINT);
-    }
 
-    private function addWorkingTime(array $workingDays): array
-    {
-        $WorkTime = [
-            [
-                'start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
-                'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')
-            ],
-            [
-                'start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
-                'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
-            ]
-        ];
+        $startMorning = Carbon::create($this->user->getStartMorningWorkHours()->Format('H:i:s'));
+        $endMorning = Carbon::create($this->user->getEndMorningWorkHours()->Format('H:i:s'));
+        $startAfternoon = Carbon::create($this->user->getStartAfternoonWorkHours()->Format('H:i:s'));
+        $endAfternoon = Carbon::create($this->user->getEndAfternoonWorkHours()->Format('H:i:s'));
 
-        $x = ['schedule' => array_map(function($WorkDay) use ($WorkTime)
+        $workingHours = array(
+            'startMorning' => $startMorning->toTimeString(),
+            'endMorning' => $endMorning->toTimeString(),
+            'startAfternoon' => $startAfternoon->toTimeString(),
+            'endAfternoon' => $endAfternoon->toTimeString()
+        );
+
+        $workingDaysAndHours = [];
+        foreach ($workingSchedule->getDays() as $workingDate)
         {
-            return [
-                'day' => $WorkDay,
-                'timeRangers' => $WorkTime
-            ];
-        }, $workingDays[0])];
+            $workingDaysAndHours[] = new DayIntervals($workingDate, $workingHours);
+        }
 
-        return $x;
+        $scheduleFinal = new ScheduleFinal($workingDaysAndHours);
+
+
+
+
+dd($scheduleFinal);
+
+
+
+
+
+
+
+
+
+
+
+
+        return json_encode($scheduleFinal, JSON_PRETTY_PRINT);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
+            $workingTime = [
+                    [
+                        'start' => $startMorning->toTimeString(),
+                        'end' => $endMorning->toTimeString()
+                    ],
+                    [
+                        'start' => $startAfternoon->toTimeString(),
+                        'end' => $endAfternoon->toTimeString()
+                    ]
+            ];
+    */
+
+
+
+
+
 
 
 
