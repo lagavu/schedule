@@ -26,18 +26,21 @@ class Schedule
         $holidays = $this->calendar->getHolidays();
         $weekend = $this->getWeekendDays($startDate, $endDate);
         $vacation = $this->getVacationDays($this->user);
+        $parties = $this->getCompanyPartiesDays();
 
         $workingDays = $allDays
             ->remove($holidays)
             ->remove($weekend)
-            ->remove($vacation);
+            ->remove($vacation)
+            ->remove($parties);
 
+        $workingDays = $this->addFirstDayPartyInSchedule($workingDays);
         $schedule = $this->addWorkingTime(array_values((array)$workingDays));
 
         return json_encode($schedule, JSON_PRETTY_PRINT);
     }
 
-    private function addWorkingTime(array $workingDays): array
+    private function addWorkingTime(array $workingDaysWithParties): array
     {
         $WorkTime = [
             [
@@ -50,58 +53,16 @@ class Schedule
             ]
         ];
 
-        $x = ['schedule' => array_map(function($WorkDay) use ($WorkTime)
+        $schedule = ['schedule' => array_map(function($WorkDay) use ($WorkTime)
         {
             return [
                 'day' => $WorkDay,
-                'timeRangers' => $WorkTime
+                'timeRangers' => $this->checkWorkingTimeWhenParty($WorkDay, $WorkTime)
             ];
-        }, $workingDays[0])];
+        }, $workingDaysWithParties[0])];
 
-        return $x;
+        return $schedule;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    private function addWorkingTime($workingDays): array
-    {
-        return ['schedule' => array_map(function($WorkDay) use ()
-        {
-            return [
-                'day' => $WorkDay,
-                'timeRangers' => [
-                    [
-                        'start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
-                        'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')
-                    ],
-                    [
-                        'start' => $this->user->getStartAfternoonWorkHours()->Format('H:i:s'),
-                        'end' => $this->user->getEndAfternoonWorkHours()->Format('H:i:s')
-                    ]
-                ]
-            ];
-        }, $workingDays[0])];
-    }
-
-    $this->checkWorkingTimeWhenParty($WorkDay, $WorkTime)
-*/
-
-
-
-
-
 
     private function getVacationDays(User $user): Days
     {
@@ -131,10 +92,10 @@ class Schedule
         return new Days($weekend);
     }
 
-    private function removeCompanyPartiesDays(): array
+    private function getCompanyPartiesDays(): Days
     {
         $partiesDate = [];
-        $allPartyCompany = $this->parties;
+        $allPartyCompany = $this->partyRepository->getParties();
 
         for ($i = 0; $i < count($allPartyCompany); $i++) {
 
@@ -146,20 +107,22 @@ class Schedule
                 $startDateParty->addDay();
             }
         }
-        return $partiesDate;
+        return new Days($partiesDate);
     }
 
-    private function addFirstDayPartyInSchedule($scheduleWithoutPartyDays)
+    private function addFirstDayPartyInSchedule($workingDays): Days
     {
         $firstDaysParty = [];
-        foreach ($this->parties as $party)
+        $workingDays = array_values((array)$workingDays);
+
+        foreach ($this->partyRepository->getParties() as $party)
         {
             $firstDaysParty[] = $party->getStartDayParty()->Format('Y-m-d');
         }
-        $DaysMerge = array_merge($scheduleWithoutPartyDays, $firstDaysParty);
-        asort($DaysMerge);
+        $daysMerge = array_merge($workingDays[0], $firstDaysParty);
+        asort($daysMerge);
 
-        return $DaysMerge;
+        return new Days($daysMerge);
     }
 
     private function checkWorkingTimeWhenParty($userWorkDay, $userWorkTime)
