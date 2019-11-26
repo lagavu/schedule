@@ -20,7 +20,7 @@ class Schedule
         $this->calendar = $calendar;
     }
 
-    public function getSchedule(\DateTime $startDate, \DateTime $endDate): string
+    public function getSchedule(\DateTime $startDate, \DateTime $endDate): array
     {
         $allDays = Days::fromRange($startDate, $endDate);
         $holidays = $this->calendar->getHolidays();
@@ -39,7 +39,7 @@ class Schedule
         $schedule = $this->addWorkingHours(array_values((array)$workingDaysWithParty));
 
 
-        return json_encode($schedule, JSON_PRETTY_PRINT);
+        return $schedule;
     }
 
     private function addWorkingHours(array $workingDaysWithParties): array

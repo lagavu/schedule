@@ -48,7 +48,7 @@ class ScheduleController extends AbstractController
        $scheduleUser = $schedule->getSchedule($startDate, $endDate);
 
         return $this->render('schedule.html.twig', [
-            'json' => $scheduleUser,
+            'json' => json_encode($scheduleUser, JSON_PRETTY_PRINT),
             'user' => $user,
             'vacations' => $user->getVacation()->toArray(),
             'parties' => $partyRepository->getParties(),

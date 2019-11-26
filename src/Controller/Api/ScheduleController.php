@@ -25,15 +25,15 @@ class ScheduleController extends AbstractController
                           UserRepository $userRepository, GoogleCalendar $calendar): JsonResponse
     {
         $userId = $request->query->get('userId');
-        $startDate = new \DateTime($request->query->get('startDate'));
-        $endDate = new \DateTime($request->query->get('endDate'));
+        $startDate = $request->query->get('startDate');
+        $endDate = $request->query->get('endDate');
 
         $user = $userRepository->findUser($userId);
 
                 $schedule = new Schedule($user, $partyRepository, $calendar);
-                $scheduleUser = $schedule->getSchedule($startDate, $endDate);
-dd(json_decode($scheduleUser), $scheduleUser);
-        return $this->json( ['username' => 'jane.doe']);
+                $scheduleUser = $schedule->getSchedule(new \DateTime($startDate), new \DateTime($endDate));
+
+        return $this->json($scheduleUser);
 
     }
 }
