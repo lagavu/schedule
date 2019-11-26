@@ -35,21 +35,17 @@ class Schedule
             ->remove($parties);
 
 
-        $workingDays = $this->addFirstDayPartyInSchedule($workingDays);
-        $schedule = $this->addWorkingTime(array_values((array)$workingDays));
+        $workingDaysWithParty = $this->addFirstDayPartyInSchedule($workingSchedule);
+        $schedule = $this->addWorkingHours(array_values((array)$workingDaysWithParty));
+
 
         return json_encode($schedule, JSON_PRETTY_PRINT);
     }
 
+    private function addWorkingHours(array $workingDaysWithParties): array
 
-
-
-
-
-
-    private function addWorkingTime(array $workingDaysWithParties): array
     {
-        $WorkTime = [
+        $WorkHours = [
             [
                 'start' => $this->user->getStartMorningWorkHours()->Format('H:i:s'),
                 'end' => $this->user->getEndMorningWorkHours()->Format('H:i:s')
@@ -60,11 +56,11 @@ class Schedule
             ]
         ];
 
-        $schedule = ['schedule' => array_map(function($WorkDay) use ($WorkTime)
+        $schedule = ['schedule' => array_map(function($WorkDay) use ($WorkHours)
         {
             return [
                 'day' => $WorkDay,
-                'timeRangers' => $this->checkWorkingTimeWhenParty($WorkDay, $WorkTime)
+                'timeRangers' => $this->checkWorkingTimeWhenParty($WorkDay, $WorkHours)
             ];
         }, $workingDaysWithParties[0])];
 
