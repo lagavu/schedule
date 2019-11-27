@@ -27,11 +27,6 @@ class User
     private $vacation;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $user_id;
-
-    /**
      * @ORM\Column(type="time")
      */
     private $start_morning_work_hours;

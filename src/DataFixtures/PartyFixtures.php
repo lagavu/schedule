@@ -30,6 +30,5 @@ class PartyFixtures extends Fixture
         $manager->persist($party);
 
         $manager->flush();
-
     }
 }

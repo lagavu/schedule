@@ -74,6 +74,8 @@
                             </td>
                         {% endif %}
                     </tbody>
+                {% else %}
+                        Запросите график сотрудника чтобы узнать его отпуск
                 {% endif %}
             </table>
             <br>
@@ -124,7 +126,7 @@
                  {{ json }}
                 </pre>
             {% else %}
-                <h5 class="font-weight-bolder">ID users</h5>
+                <h5 class="font-weight-bolder">Ваши ID работников</h5>
                 {% for user in users %}
                     <tr>
                         <td>
