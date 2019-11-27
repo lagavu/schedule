@@ -18,12 +18,13 @@ class ScheduleController extends AbstractController
     /**
      * @Route("/", name="index")
      */
-    public function index(GoogleCalendar $calendar, UserRepository $userRepository): Response
+    public function index(UserRepository $userRepository, PartyRepository $partyRepository, GoogleCalendar $calendar): Response
     {
         return $this->render('schedule.html.twig', [
             'year' => date('Y'),
             'users' => $userRepository->all(),
             'calendar' => $calendar->getHolidaysDateAndName(),
+            'parties' => $partyRepository->getParties(),
         ]);
     }
 

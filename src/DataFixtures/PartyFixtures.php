@@ -27,7 +27,7 @@ class PartyFixtures extends Fixture
             $partyTimeEnd = date("$hourEnd:00:00");
 
             $party = new Party();
-            $party->setName($parties[$randomNameParty]);
+            $party->setName($parties[$randomNameParty].' '.$i);
             $party->setStartDayParty(new \DateTime($partyDayStart.''.$partyTimeStart));
             $party->setEndDayParty(new \DateTime($partyDayEnd.''.$partyTimeEnd));
             $manager->persist($party);
