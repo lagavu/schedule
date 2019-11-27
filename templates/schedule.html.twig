@@ -57,23 +57,23 @@
                             c {{ user.startafternoonworkhours|date('H:i:s') }} до {{ user.endafternoonworkhours|date('H:i:s') }}
                         </td>
                     </tr>
-                <td class="row">Отпуск:</td>
-                {% if vacations  is defined %}
-                        {% for vacation in vacations %}
-                            <tr>
-                                <td>
-                                    от {{ vacation.startvacation|date('Y.m.d') }} до {{ vacation.endvacation|date('Y.m.d') }} <br>
-                                    <br>
+                    <td class="row">Отпуск:</td>
+                        {% if vacations  is defined %}
+                                {% for vacation in vacations %}
+                                    <tr>
+                                        <td>
+                                            от {{ vacation.startvacation|date('Y.m.d') }} до {{ vacation.endvacation|date('Y.m.d') }} <br>
+                                            <br>
 
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                    <td>
-                        У данного сотрудника отпуск не указан
-                    </td>
-                    {% endif %}
-                </tbody>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                        {% else %}
+                            <td>
+                                У данного сотрудника отпуск не указан
+                            </td>
+                        {% endif %}
+                    </tbody>
                 {% endif %}
             </table>
             <br>
@@ -116,11 +116,23 @@
             </table>
         </div>
         <div class="col-6">
+            {% if json is defined %}
             <h5 class="font-weight-bolder">JSON</h5>
             <p>Выходные дни не учитываются</p>
+
                 <pre>
                  {{ json }}
                 </pre>
+            {% else %}
+                <h5 class="font-weight-bolder">ID users</h5>
+                {% for user in users %}
+                    <tr>
+                        <td>
+                            {{ user.id }} <br>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

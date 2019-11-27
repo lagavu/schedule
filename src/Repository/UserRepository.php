@@ -21,4 +21,9 @@ class UserRepository
     {
         return $this->repository->findOneBy(['id' => $id]);
     }
+
+    public function all(): array
+    {
+        return $this->repository->findAll();
+    }
 }

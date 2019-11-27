@@ -18,11 +18,6 @@ class Vacation
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $user_id;
-
-    /**
      * @ORM\Column(type="date")
      */
     private $start_vacation;
@@ -42,18 +37,6 @@ class Vacation
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUserId(): ?int
-    {
-        return $this->user_id;
-    }
-
-    public function setUserId(int $user_id): self
-    {
-        $this->user_id = $user_id;
-
-        return $this;
     }
 
     public function getStartVacation(): ?\DateTimeInterface
@@ -91,4 +74,5 @@ class Vacation
 
         return $this;
     }
+
 }

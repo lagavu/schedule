@@ -7,9 +7,6 @@ use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
 use App\Service\Schedule;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
-use DateInterval;
-use DatePeriod;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +18,12 @@ class ScheduleController extends AbstractController
     /**
      * @Route("/", name="index")
      */
-    public function index(GoogleCalendar $calendar): Response
+    public function index(GoogleCalendar $calendar, UserRepository $userRepository): Response
     {
-        return $this->render('schedule/index.html.twig', [
+        return $this->render('schedule.html.twig', [
             'year' => date('Y'),
-            'calendar' => $calendar->holiday(),
+            'users' => $userRepository->all(),
+            'calendar' => $calendar->getHolidaysDateAndName(),
         ]);
     }
 
@@ -40,7 +38,6 @@ class ScheduleController extends AbstractController
        $userId = $request->query->get('userId');
        $startDate = Carbon::create($request->query->get('startDate'));
        $endDate = Carbon::create($request->query->get('endDate'));
-
 
        $user = $userRepository->findUser($userId);
 
