@@ -5,34 +5,30 @@ namespace App\DataFixtures;
 use App\Model\Party;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Faker\Factory;
 
 class PartyFixtures extends Fixture
 {
 
     public function load(ObjectManager $manager)
     {
-        $faker = Factory::create();
+        $party = new Party();
+        $party->setName('Прошедший праздник компании');
+        $party->setStartDayParty(new \DateTime('2018-12-03 15:00:00'));
+        $party->setEndDayParty(new \DateTime('2018-12-10 00:00:00'));
+        $manager->persist($party);
 
-        for ($i = 0; $i < 10; $i++) {
-            $parties = ['Корпоратив','ДР Компании','Просто праздник'];
-            $randomNameParty = array_rand($parties, 1);
-            $dateParties = $faker->dateTimeBetween($startDate = '-1 years', $endDate = 'now');
-            $partyDayStart = $dateParties->format('Y-m-d');
-            $numberDaysParties = $faker->randomElement([1, 3]);
-            $partyDayEnd = date('Y-m-d', strtotime('+ '.$numberDaysParties.' days' , strtotime($partyDayStart)));
-            $hourStart = $faker->numberBetween(1,24);
-            $hourEnd = $faker->numberBetween(1,24);
-            $partyTimeStart = date("$hourStart:00:00");
-            $partyTimeEnd = date("$hourEnd:00:00");
+        $party = new Party();
+        $party->setName('ДР Компании');
+        $party->setStartDayParty(new \DateTime('2019-01-21 16:00:00'));
+        $party->setEndDayParty(new \DateTime('2019-01-23'));
+        $manager->persist($party);
 
-            $party = new Party();
-            $party->setName($parties[$randomNameParty].' '.$i);
-            $party->setStartDayParty(new \DateTime($partyDayStart.''.$partyTimeStart));
-            $party->setEndDayParty(new \DateTime($partyDayEnd.''.$partyTimeEnd));
-            $manager->persist($party);
+        $party = new Party();
+        $party->setName('Корпоратив');
+        $party->setStartDayParty(new \DateTime('2019-01-25 12:00:00'));
+        $party->setEndDayParty(new \DateTime('2019-01-27'));
+        $manager->persist($party);
 
-        }
         $manager->flush();
 
     }

@@ -27,6 +27,11 @@ class User
     private $vacation;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $user_id;
+
+    /**
      * @ORM\Column(type="time")
      */
     private $start_morning_work_hours;
@@ -150,4 +155,22 @@ class User
     {
         $this->end_afternoon_work_hours = $end_afternoon_work_hours;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    /**
+     * @param mixed $user_id
+     */
+    public function setUserId($user_id): void
+    {
+        $this->user_id = $user_id;
+    }
+
+
 }
