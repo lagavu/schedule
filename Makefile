@@ -1,11 +1,11 @@
 up: docker-up
 down: docker-down
 restart: docker-down docker-up
-init: docker-down-clear docker-pull docker-build docker-up shedule-init
-test-all: shedule-test
-test-schedule: shedule-test-schedule
-test-schedule-form: shedule-test-schedule-form
-
+init: docker-pull docker-build docker-up schedule-init
+test-all: schedule-test
+test-schedule: schedule-test-schedule
+test-schedule-form: schedule-test-schedule-form
+fixtures: schedule-fixtures
 
 docker-up:
 	docker-compose up -d
@@ -22,44 +22,35 @@ docker-pull:
 docker-build:
 	docker-compose build
 
-shedule-init: shedule-composer-install shedule-assets-install shedule-migrations shedule-ready
+schedule-init: schedule-composer-install schedule-assets-install schedule-migrations schedule-ready
 
-shedule-clear:
-	docker run --rm -v ${PWD}/shedule:/app --workdir=/app alpine rm -f .ready
+schedule-clear:
+	docker run --rm -v ${PWD}/schedule:/app --workdir=/app alpine rm -f .ready
 
-shedule-composer-install:
-	docker-compose run --rm shedule-php-cli composer install
+schedule-composer-install:
+	docker-compose run --rm schedule-php-cli composer install
 
-shedule-assets-install:
-	docker-compose run --rm shedule-node yarn install
-	docker-compose run --rm shedule-node npm rebuild node-sass
+schedule-assets-install:
+	docker-compose run --rm schedule-node yarn install
+	docker-compose run --rm schedule-node npm rebuild node-sass
 
-shedule-oauth-keys:
-	docker-compose run --rm shedule-php-cli mkdir -p var/oauth
-	docker-compose run --rm shedule-php-cli openssl genrsa -out var/oauth/private.key 2048
-	docker-compose run --rm shedule-php-cli openssl rsa -in var/oauth/private.key -pubout -out var/oauth/public.key
-	docker-compose run --rm shedule-php-cli chmod 644 var/oauth/private.key var/oauth/public.key
+schedule-migrations:
+	docker-compose run --rm schedule-php-cli php bin/console doctrine:migrations:migrate --no-interaction
 
-shedule-wait-db:
-	until docker-compose exec -T shedule-postgres pg_isready --timeout=0 --dbname=app ; do sleep 1 ; done
+schedule-fixtures:
+	docker-compose run --rm schedule-php-cli php bin/console doctrine:fixtures:load --no-interaction
 
-shedule-migrations:
-	docker-compose run --rm shedule-php-cli php bin/console doctrine:migrations:migrate --no-interaction
+schedule-ready:
+	docker run --rm -v ${PWD}/schedule:/app --workdir=/app alpine touch .ready
 
-shedule-fixtures:
-	docker-compose run --rm shedule-php-cli php bin/console doctrine:fixtures:load --no-interaction
+schedule-assets-dev:
+	docker-compose rhedulen --rm schedule-node npm run dev
 
-shedule-ready:
-	docker run --rm -v ${PWD}/shedule:/app --workdir=/app alpine touch .ready
+schedule-test-schedule:
+	sudo docker-compose run --rm schedule-php-cli php bin/phpunit tests/Functional/ScheduleControllerTest.php
 
-shedule-assets-dev:
-	docker-compose rhedulen --rm shedule-node npm run dev
+schedule-test-schedule-form:
+	sudo docker-compose run --rm schedule-php-cli php bin/phpunit tests/Functional/ScheduleControllerValidationTest.php
 
-shedule-test-schedule:
-	sudo docker-compose run --rm shedule-php-cli php bin/phpunit tests/Functional/ScheduleControllerTest.php
-
-shedule-test-schedule-form:
-	sudo docker-compose run --rm shedule-php-cli php bin/phpunit tests/Functional/ScheduleControllerValidationTest.php
-
-shedule-test:
-	sudo docker-compose run --rm shedule-php-cli php bin/phpunit tests/Functional
+schedule-test:
+	sudo docker-compose run --rm schedule-php-cli php bin/phpunit tests/Functional

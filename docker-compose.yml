@@ -1,0 +1,56 @@
+version: '3'
+services:
+    schedule-nginx:
+        build:
+            context: ./docker/development
+            dockerfile: nginx.docker
+        volumes:
+            - ./:/app
+        depends_on:
+            - schedule-php-fpm
+        ports:
+            - "8080:80"
+    schedule-php-fpm:
+        build:
+            context: ./docker/development
+            dockerfile: php-fpm.docker
+        volumes:
+            - ./:/app
+        depends_on:
+            - schedule-mysql
+    schedule-php-cli:
+        build:
+            context: ./docker/development
+            dockerfile: php-cli.docker
+        volumes:
+            - ./:/app
+            - composer:/root/.composer/cache
+        depends_on:
+            - schedule-mysql
+    schedule-mysql:
+        image: mysql:5.7
+        volumes:
+            - ./docker/mysql:/var/lib/mysql
+        environment:
+            - "MYSQL_ROOT_PASSWORD=secret"
+            - "MYSQL_USER=app"
+            - "MYSQL_PASSWORD=secret"
+            - "MYSQL_DATABASE=app"
+        ports:
+            - "33065:3306"
+    schedule-node-watch:
+        image: node:12.7-alpine
+        volumes:
+            - ./:/app
+        working_dir: /app
+        command: sh -c "until [ -f .ready ] ; do sleep 1 ; done && npm run watch"
+    schedule-node:
+        image: node:12.7-alpine
+        volumes:
+            - ./:/app
+        working_dir: /app
+
+
+volumes:
+    schedule-mysql:
+    composer:
