@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Tests\Controller;
 
 use App\DataFixtures\PartyFixtures;
@@ -23,25 +22,25 @@ class ScheduleControllerTest extends WebTestCase
     private $referenceRepository;
     private $user;
 
-    public function getLink()
-    {
-        return 'api/schedule?userId='.$this->user->getId().'&startDate='.self::START_DATE.'&endDate='.self::END_DATE.'';
-    }
-
     protected function setUp(): void
     {
         $this->referenceRepository = $this->loadFixtures([UserFixtures::class, VacationFixtures::class, PartyFixtures::class])->getReferenceRepository();
         $this->user = $this->referenceRepository->getReference(UserFixtures::USER_REFERENCE);
     }
 
-    public function testScheduleController()
+    public function getLink(): string
+    {
+        return 'api/schedule?userId='.$this->user->getId().'&startDate='.self::START_DATE.'&endDate='.self::END_DATE.'';
+    }
+
+    public function testScheduleController(): void
     {
         $client = static::createClient();
         $client->request('GET', $this->getLink());
         $this->assertSame(200, $client->getResponse()->getStatusCode());
     }
 
-    public function testExcludeWeekendsFromSchedule()
+    public function testExcludeWeekendsFromSchedule(): void
     {
         $client = static::createClient();
         $client->request('GET', $this->getLink());
@@ -49,7 +48,7 @@ class ScheduleControllerTest extends WebTestCase
         $this->assertStringNotContainsString(self::WEEKEND_DATE, $jsonResponse);
     }
 
-    public function testExcludeHolidaysFromSchedule()
+    public function testExcludeHolidaysFromSchedule(): void
     {
         $client = static::createClient();
         $client->request('GET', $this->getLink());
@@ -57,7 +56,7 @@ class ScheduleControllerTest extends WebTestCase
         $this->assertStringNotContainsString(self::HOLIDAY_DATE, $jsonResponse);
     }
 
-    public function testExcludeVacationsFromSchedule()
+    public function testExcludeVacationsFromSchedule(): void
     {
         $client = static::createClient();
         $client->request('GET', $this->getLink());
@@ -68,7 +67,7 @@ class ScheduleControllerTest extends WebTestCase
     /**
      * @dataProvider partyDates
      */
-    public function testExcludeCompanyPartiesFromSchedule($date)
+    public function testExcludeCompanyPartiesFromSchedule(int $date): void
     {
         $client = static::createClient();
         $client->request('GET', $this->getLink());
@@ -76,7 +75,7 @@ class ScheduleControllerTest extends WebTestCase
         $this->assertStringNotContainsString($date, $jsonResponse);
     }
 
-    public function partyDates()
+    public function partyDates(): array
     {
         return [
             [2018-12-04],
@@ -88,7 +87,7 @@ class ScheduleControllerTest extends WebTestCase
     /**
      * @dataProvider partyStartTime
      */
-    public function testWorkingHoursWhenParty($time)
+    public function testWorkingHoursWhenParty(string $time): void
     {
         $client = static::createClient();
         $client->request('GET', $this->getLink());
@@ -96,12 +95,11 @@ class ScheduleControllerTest extends WebTestCase
         $this->assertStringContainsString($time, $jsonResponse);
     }
 
-    public function partyStartTime()
+    public function partyStartTime(): array
     {
         return [
             ['12:00:00'],
             ['16:00:00'],
         ];
     }
-
 }

@@ -10,10 +10,9 @@ class UserFixtures extends Fixture
 {
     public const USER_REFERENCE = 'user';
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $user = new User();
-
         $user->setStartMorningWorkHours(new \DateTime('09:00:00'));
         $user->setEndMorningWorkHours(new \DateTime('13:00:00'));
         $user->setStartAfternoonWorkHours(new \DateTime('14:00:00'));

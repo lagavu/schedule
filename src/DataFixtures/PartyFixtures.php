@@ -8,8 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class PartyFixtures extends Fixture
 {
-
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $party = new Party();
         $party->setName('Прошедший праздник компании');

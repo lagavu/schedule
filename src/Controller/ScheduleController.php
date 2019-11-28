@@ -39,7 +39,6 @@ class ScheduleController extends AbstractController
        $userId = $request->query->get('userId');
        $startDate = Carbon::create($request->query->get('startDate'));
        $endDate = Carbon::create($request->query->get('endDate'));
-
        $user = $userRepository->findUser($userId);
 
        $schedule = new Schedule($user, $partyRepository, $calendar);

@@ -70,12 +70,12 @@
                                 {% endfor %}
                         {% else %}
                             <td>
-                                У данного сотрудника отпуск не указан
+                                Сотрудник не имеет отпусков
                             </td>
                         {% endif %}
                     </tbody>
                 {% else %}
-                        Запросите график сотрудника чтобы узнать его отпуск
+                        Запросите график сотрудника
                 {% endif %}
             </table>
             <br>
@@ -88,7 +88,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% if parties is defined %}
+                {% if parties %}
                     {% for party in parties %}
                         <tr>
                             <td>{{ party.name }}</td>
@@ -96,6 +96,10 @@
                             <td>{{ party.enddayparty|date('Y.m.d') }} - {{ party.enddayparty|date('H:i:s') }}</td>
                         </tr>
                     {% endfor %}
+                {% else %}
+                <tr>
+                    <td>В компании нету праздников(</td>
+                </tr>
                 {% endif %}
                 </tbody>
             </table>
@@ -121,12 +125,11 @@
             {% if json is defined %}
             <h5 class="font-weight-bolder">JSON</h5>
             <p>Выходные дни не учитываются</p>
-
                 <pre>
                  {{ json }}
                 </pre>
             {% else %}
-                <h5 class="font-weight-bolder">Ваши ID работников</h5>
+                <h5 class="font-weight-bolder">Ваши ID User</h5>
                 {% for user in users %}
                     <tr>
                         <td>

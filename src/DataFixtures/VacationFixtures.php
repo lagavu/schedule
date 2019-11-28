@@ -9,8 +9,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class VacationFixtures extends Fixture implements DependentFixtureInterface
 {
-
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $vacation = new Vacation();
         $vacation->setUser($this->getReference(UserFixtures::USER_REFERENCE));

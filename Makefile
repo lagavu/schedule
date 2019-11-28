@@ -2,6 +2,9 @@ up: docker-up
 down: docker-down
 restart: docker-down docker-up
 init: docker-down-clear docker-pull docker-build docker-up shedule-init
+test-all: shedule-test
+test-schedule: shedule-test-schedule
+test-schedule-form: shedule-test-schedule-form
 
 
 docker-up:
@@ -50,10 +53,16 @@ shedule-ready:
 	docker run --rm -v ${PWD}/shedule:/app --workdir=/app alpine touch .ready
 
 shedule-assets-dev:
-	docker-compose run --rm shedule-node npm run dev
+	docker-compose rhedulen --rm shedule-node npm run dev
+
+shedule-test-schedule:
+	sudo docker-compose run --rm shedule-php-cli php bin/phpunit tests/Functional/ScheduleControllerTest.php
+
+shedule-test-schedule-form:
+	sudo docker-compose run --rm shedule-php-cli php bin/phpunit tests/Functional/ScheduleControllerValidationTest.php
 
 shedule-test:
-	docker-compose run --rm shedule-php-cli php bin/phpunit
+	sudo docker-compose run --rm shedule-php-cli php bin/phpunit tests/Functional
 
 shedule-test-coverage:
 	docker-compose run --rm shedule-php-cli php bin/phpunit --coverage-clover var/clover.xml --coverage-html var/coverage
