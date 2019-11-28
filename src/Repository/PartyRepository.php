@@ -7,12 +7,10 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class PartyRepository
 {
-    private $entityManager;
     private $repository;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
         $this->repository = $entityManager->getRepository(Party::class);
     }
 

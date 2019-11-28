@@ -28,5 +28,4 @@ class ScheduleQuery
      * @var string A "Y-m-d" formatted value
      */
     public $endDate;
-
 }

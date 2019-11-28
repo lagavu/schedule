@@ -23,7 +23,7 @@ class Days
         return new Days(array_merge($days->getDays(), $this->getDays()));
     }
 
-    public static function fromRange(\DateTime $startDate, \DateTime $endDate): Days
+    public static function fromRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): Days
     {
         $datesRange = [];
         $startDate = new Carbon($startDate->format('Y-m-d'));
@@ -33,6 +33,7 @@ class Days
             $datesRange[] = $startDate->toDateString();
             $startDate->addDay();
         }
+
         return new self($datesRange);
     }
 

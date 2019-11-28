@@ -33,7 +33,6 @@ class Vacation
      */
     private $user;
 
-
     public function getId(): ?int
     {
         return $this->id;
@@ -74,5 +73,4 @@ class Vacation
 
         return $this;
     }
-
 }

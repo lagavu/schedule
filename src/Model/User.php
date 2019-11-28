@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-
-use App\Model\Vacation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -150,22 +148,4 @@ class User
     {
         $this->end_afternoon_work_hours = $end_afternoon_work_hours;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getUserId()
-    {
-        return $this->user_id;
-    }
-
-    /**
-     * @param mixed $user_id
-     */
-    public function setUserId($user_id): void
-    {
-        $this->user_id = $user_id;
-    }
-
-
 }

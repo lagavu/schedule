@@ -63,12 +63,3 @@ shedule-test-schedule-form:
 
 shedule-test:
 	sudo docker-compose run --rm shedule-php-cli php bin/phpunit tests/Functional
-
-shedule-test-coverage:
-	docker-compose run --rm shedule-php-cli php bin/phpunit --coverage-clover var/clover.xml --coverage-html var/coverage
-
-shedule-test-unit:
-	docker-compose run --rm shedule-php-cli php bin/phpunit --testsuite=unit
-
-shedule-test-unit-coverage:
-	docker-compose run --rm shedule-php-cli php bin/phpunit --testsuite=unit --coverage-clover var/clover.xml --coverage-html var/coverage

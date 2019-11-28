@@ -34,10 +34,8 @@ class Schedule
             ->remove($vacation)
             ->remove($parties);
 
-
         $workingDaysWithParty = $this->addFirstDayPartyInSchedule($workingSchedule);
         $schedule = $this->addWorkingHours(array_values((array)$workingDaysWithParty));
-
 
         return $schedule;
     }
@@ -75,6 +73,7 @@ class Schedule
             $vacationDays = Days::fromRange($vacation->getStartVacation(), $vacation->getEndVacation());
             $allVacationDays = $allVacationDays->add($vacationDays);
         }
+
         return $allVacationDays;
     }
 
@@ -92,6 +91,7 @@ class Schedule
                 $weekend[] = $currentDate;
             } $startDateUnixTime += 86400;
         }
+
         return new Days($weekend);
     }
 
@@ -110,17 +110,22 @@ class Schedule
                 $startDateParty->addDay();
             }
         }
+
         return new Days($partiesDate);
     }
 
-    private function addFirstDayPartyInSchedule($workingDays): Days
+    private function addFirstDayPartyInSchedule(Days $workingDays): Days
     {
         $firstDaysParty = [];
         $workingDays = array_values((array)$workingDays);
+        $firstDayWorkingDays = array_shift($workingDays[array_keys($workingDays)[0]]);
 
         foreach ($this->partyRepository->getParties() as $party)
         {
-            $firstDaysParty[] = $party->getStartDayParty()->Format('Y-m-d');
+            if($party->getStartDayParty()->Format('Y-m-d') > $firstDayWorkingDays)
+            {
+                $firstDaysParty[] = $party->getStartDayParty()->Format('Y-m-d');
+            }
         }
         $daysMerge = array_merge($workingDays[0], $firstDaysParty);
         asort($daysMerge);
@@ -128,7 +133,7 @@ class Schedule
         return new Days($daysMerge);
     }
 
-    private function checkWorkingTimeWhenParty($userWorkDay, $userWorkTime)
+    private function checkWorkingTimeWhenParty(string $userWorkDay, array $userWorkTime): array
     {
         foreach ($this->partyRepository->getParties() as $party)
         {
@@ -147,6 +152,7 @@ class Schedule
                             'end' => $party->getStartDayParty()->Format('H:i:s')
                         ]
                     ];
+
                     return $userWorkTime;
                 }
                 else {
@@ -156,10 +162,12 @@ class Schedule
                             'end' => $userWorkTime = $party->getStartDayParty()->Format('H:i:s')
                         ],
                     ];
+
                     return $userWorkTime;
                 }
             }
         }
+
         return $userWorkTime;
     }
 }

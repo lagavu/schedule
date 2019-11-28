@@ -9,11 +9,9 @@ use Doctrine\ORM\EntityManagerInterface;
 class UserRepository
 {
     private $repository;
-    private $connection;
 
-    public function __construct(Connection $connection, EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->connection = $connection;
         $this->repository = $entityManager->getRepository(User::class);
     }
 

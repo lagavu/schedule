@@ -33,6 +33,7 @@ class GoogleCalendar
                 "name_holiday" => $nameHolidays[$i]
             ];
         }
+
         return $holidaysDateAndName;
     }
 
@@ -44,6 +45,7 @@ class GoogleCalendar
     private static function countHolidays(): int
     {
         $countHolidays = GoogleCalendar::googleCalendarApi();
+
         return count($countHolidays['items']);
     }
 
@@ -71,6 +73,7 @@ class GoogleCalendar
         {
             $nameHolidays[] = $itemsGoogleCalendarApi['items'][$i]['summary'];
         };
+
         return $nameHolidays;
     }
 }
