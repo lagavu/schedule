@@ -8,6 +8,7 @@ use App\DataFixtures\VacationFixtures;
 use App\Model\User;
 use App\RemoteApi\GoogleCalendarApi;
 use App\Repository\PartyRepository;
+use App\Service\Days;
 use App\Service\Schedule;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -18,13 +19,9 @@ class ScheduleControllerTest extends WebTestCase
 
     private const START_DATE = '2019-01-01';
     private const END_DATE = '2019-01-31';
-
     private const WEEKEND_DATE = '2019-01-05';
     private const HOLIDAY_DATE = '2019-01-01';
     private const VACATION_DATE = '2019-01-16';
-    private const PARTY_DATE = '2019-01-16';
-    private const GOOGLE_CALENDAR_API = '2019-01-16';
-
 
     private $referenceRepository;
 
@@ -46,22 +43,10 @@ class ScheduleControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->referenceRepository = $this->loadFixtures([UserFixtures::class, VacationFixtures::class, PartyFixtures::class])->getReferenceRepository();
-        var_dump($this->referenceRepository); dd(22);
-
         $this->user = $this->referenceRepository->getReference(UserFixtures::USER_REFERENCE);
-
         $this->partyRepository = $this->getContainer()->get(PartyRepository::class);
-        $this->calendarApi = $this->getContainer()->get(GoogleCalendarApi::class);
+        $this->calendarApi = $this->stubHolidays();
     }
-
-        /*
-    public function testScheduleController(): void
-    {
-        $client = static::createClient();
-        $client->request('GET', $this->getLink());
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
-    }
-    */
 
     public function testExcludeWeekendsFromSchedule(): void
     {
@@ -77,6 +62,34 @@ class ScheduleControllerTest extends WebTestCase
         $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
         $this->assertArrayNotHasKey(self::HOLIDAY_DATE, $scheduleUser);
+    }
+
+    public function stubHolidays()
+    {
+        $holidays = new Days([
+            '2019-01-01',
+            '2019-01-02',
+            '2019-01-03',
+            '2019-01-04',
+            '2019-01-07',
+            '2019-01-08',
+            '2019-02-23',
+            '2019-03-08',
+            '2019-05-01',
+            '2019-05-02',
+            '2019-05-03',
+            '2019-05-09',
+            '2019-05-10',
+            '2019-06-12',
+            '2019-09-01',
+            '2019-11-04',
+        ]);
+
+        $stub = $this->createMock(GoogleCalendarApi::class);
+        $stub->method('getHolidays')
+             ->willReturn($holidays);
+
+        return $stub;
     }
 
     public function testExcludeVacationsFromSchedule(): void

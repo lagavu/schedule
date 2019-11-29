@@ -10,11 +10,11 @@ class ScheduleControllerValidationTest extends WebTestCase
 {
     use FixturesTrait;
 
-    private $referenceRepository;
-    private $user;
-
     private const VALID_START_DATE = '2019-01-01';
     private const VALID_END_DATE = '2019-01-31';
+
+    private $referenceRepository;
+    private $user;
 
     protected function setUp(): void
     {
@@ -44,7 +44,6 @@ class ScheduleControllerValidationTest extends WebTestCase
         $client->request('GET', $this->getApiLink($invalidStartDate, self::VALID_END_DATE));
 
         $this->assertSame(422, $client->getResponse()->getStatusCode());
-
     }
 
     /**

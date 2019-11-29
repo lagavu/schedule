@@ -1,7 +1,7 @@
 up: docker-up
 down: docker-down
 restart: docker-down docker-up
-init: docker-pull docker-build docker-up schedule-init
+init: docker-down-clear docker-pull docker-build docker-up schedule-init
 test-all: schedule-test
 test-schedule: schedule-test-schedule
 test-schedule-form: schedule-test-schedule-form
