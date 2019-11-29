@@ -3,21 +3,21 @@
 namespace App\Service;
 
 use App\Model\User;
-use App\RemoteService\GoogleCalendar;
+use App\RemoteApi\GoogleCalendarApi;
 use App\Repository\PartyRepository;
 use Carbon\Carbon;
 
 class Schedule
 {
-    private $user;
-    private $partyRepository;
-    private $calendar;
+    public $user;
+    public $partyRepository;
+    public $calendar;
 
-    public function __construct(User $user, PartyRepository $partyRepository, GoogleCalendar $calendar)
+    public function __construct(User $user, PartyRepository $partyRepository, GoogleCalendarApi $calendarApi)
     {
         $this->user = $user;
         $this->partyRepository = $partyRepository;
-        $this->calendar = $calendar;
+        $this->calendar = $calendarApi;
     }
 
     public function getSchedule(\DateTime $startDate, \DateTime $endDate): array
@@ -41,7 +41,6 @@ class Schedule
     }
 
     private function addWorkingHours(array $workingDaysWithParties): array
-
     {
         $WorkHours = [
             [

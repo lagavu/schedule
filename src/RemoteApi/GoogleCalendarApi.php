@@ -1,16 +1,16 @@
 <?php
 
-namespace App\RemoteService;
+namespace App\RemoteApi;
 
 use App\Service\Days;
 
-class GoogleCalendar
+class GoogleCalendarApi
 {
     private const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3/calendars/russian__ru%40holiday.calendar.google.com/events?key=AIzaSyC8khrJO57yl4szjLOuyQrlW7R_CKgwaH0';
 
     public function getHolidays(): Days
     {
-        $datesHolidays = GoogleCalendar::getDatesHolidays();
+        $datesHolidays = GoogleCalendarApi::getDatesHolidays();
         $currentYearHolidays = array_filter($datesHolidays, function ($var) {
             return substr($var, 0, 4) === date("Y");
         });
@@ -21,9 +21,9 @@ class GoogleCalendar
 
     public function getHolidaysDateAndName(): array
     {
-        $countHolidays = GoogleCalendar::countHolidays();
-        $datesHolidays = GoogleCalendar::getDatesHolidays();
-        $nameHolidays = GoogleCalendar::getNameHolidays();
+        $countHolidays = GoogleCalendarApi::countHolidays();
+        $datesHolidays = GoogleCalendarApi::getDatesHolidays();
+        $nameHolidays = GoogleCalendarApi::getNameHolidays();
         $holidaysDateAndName = [];
 
         for ($i = 0; $i < $countHolidays; $i++)
@@ -44,15 +44,15 @@ class GoogleCalendar
 
     private static function countHolidays(): int
     {
-        $countHolidays = GoogleCalendar::googleCalendarApi();
+        $countHolidays = GoogleCalendarApi::googleCalendarApi();
 
         return count($countHolidays['items']);
     }
 
     private static function getDatesHolidays(): array
     {
-        $itemsGoogleCalendarApi = GoogleCalendar::googleCalendarApi();
-        $countHolidays = GoogleCalendar::countHolidays();
+        $itemsGoogleCalendarApi = GoogleCalendarApi::googleCalendarApi();
+        $countHolidays = GoogleCalendarApi::countHolidays();
         $datesHolidays = [];
 
         for ($i=0; $i < $countHolidays; $i++)
@@ -65,8 +65,8 @@ class GoogleCalendar
 
     private static function getNameHolidays(): array
     {
-        $itemsGoogleCalendarApi = GoogleCalendar::googleCalendarApi();
-        $countHolidays = GoogleCalendar::countHolidays();
+        $itemsGoogleCalendarApi = GoogleCalendarApi::googleCalendarApi();
+        $countHolidays = GoogleCalendarApi::countHolidays();
         $nameHolidays = [];
 
         for ($i=0; $i < $countHolidays; $i++)

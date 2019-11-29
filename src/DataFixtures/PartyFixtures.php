@@ -8,6 +8,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class PartyFixtures extends Fixture
 {
+
     public function load(ObjectManager $manager): void
     {
         $party = new Party();
@@ -29,5 +30,6 @@ class PartyFixtures extends Fixture
         $manager->persist($party);
 
         $manager->flush();
+
     }
 }

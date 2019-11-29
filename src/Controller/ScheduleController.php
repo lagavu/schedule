@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\RemoteService\GoogleCalendar;
+use App\RemoteApi\GoogleCalendarApi;
 use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
 use App\Service\Schedule;
@@ -15,16 +15,28 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ScheduleController extends AbstractController
 {
+
+    private $userRepository;
+    private $partyRepository;
+    private $calendarApi;
+
+    public function __construct(UserRepository $userRepository, PartyRepository $partyRepository, GoogleCalendarApi $calendarApi)
+    {
+        $this->userRepository = $userRepository;
+        $this->partyRepository = $partyRepository;
+        $this->calendarApi = $calendarApi;
+    }
+
     /**
      * @Route("/", name="index")
      */
-    public function index(UserRepository $userRepository, PartyRepository $partyRepository, GoogleCalendar $calendar): Response
+    public function index(): Response
     {
         return $this->render('schedule.html.twig', [
             'year' => date('Y'),
-            'users' => $userRepository->all(),
-            'calendar' => $calendar->getHolidaysDateAndName(),
-            'parties' => $partyRepository->getParties(),
+            'users' => $this->userRepository->all(),
+            'calendar' => $this->calendarApi->getHolidaysDateAndName(),
+            'parties' => $this->partyRepository->getParties(),
         ]);
     }
 
@@ -32,24 +44,22 @@ class ScheduleController extends AbstractController
      * @Route("schedule", name="schedule", methods={"GET"})
      * @throws Exception
      */
-    public function schedule(
-        Request $request, PartyRepository $partyRepository,
-        UserRepository $userRepository, GoogleCalendar $calendar): Response
+    public function schedule(Request $request): Response
     {
        $userId = $request->query->get('userId');
        $startDate = Carbon::create($request->query->get('startDate'));
        $endDate = Carbon::create($request->query->get('endDate'));
-       $user = $userRepository->findUser($userId);
+       $user = $this->userRepository->findUser($userId);
 
-       $schedule = new Schedule($user, $partyRepository, $calendar);
+       $schedule = new Schedule($user, $this->partyRepository, $this->calendarApi);
        $scheduleUser = $schedule->getSchedule($startDate, $endDate);
 
         return $this->render('schedule.html.twig', [
             'json' => json_encode($scheduleUser, JSON_PRETTY_PRINT),
             'user' => $user,
             'vacations' => $user->getVacation()->toArray(),
-            'parties' => $partyRepository->getParties(),
-            'calendar' => $calendar->getHolidaysDateAndName(),
+            'parties' => $this->partyRepository->getParties(),
+            'calendar' => $this->calendarApi->getHolidaysDateAndName(),
             'year' => date('Y'),
         ]);
     }

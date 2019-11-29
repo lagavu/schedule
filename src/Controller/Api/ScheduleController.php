@@ -2,7 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\RemoteService\GoogleCalendar;
+use App\RemoteApi\GoogleCalendarApi;
 use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
 use App\Service\Schedule;
@@ -16,12 +16,22 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ScheduleController extends AbstractController
 {
+    private $userRepository;
+    private $partyRepository;
+    private $calendarApi;
+
+    public function __construct(UserRepository $userRepository, PartyRepository $partyRepository, GoogleCalendarApi $calendarApi)
+    {
+        $this->userRepository = $userRepository;
+        $this->partyRepository = $partyRepository;
+        $this->calendarApi = $calendarApi;
+    }
+
     /**
      * @Route("/api/schedule", name="api.schedule", methods={"GET"})
      * @throws Exception
      */
-    public function index(Request $request, PartyRepository $partyRepository,
-                          UserRepository $userRepository, GoogleCalendar $calendar, ValidatorInterface $validator): Response
+    public function index(Request $request, ValidatorInterface $validator): Response
     {
         $scheduleQuery = new ScheduleQuery();
         $scheduleQuery->userId = $request->query->get('userId');
@@ -39,8 +49,8 @@ class ScheduleController extends AbstractController
             return $response;
         }
 
-        $user = $userRepository->findUser($scheduleQuery->userId);
-        $schedule = new Schedule($user, $partyRepository, $calendar);
+        $user = $this->userRepository->findUser($scheduleQuery->userId);
+        $schedule = new Schedule($user, $this->partyRepository, $this->calendarApi);
         $scheduleUser = $schedule->getSchedule(new \DateTime($scheduleQuery->startDate), new \DateTime($scheduleQuery->endDate));
 
         return $this->json($scheduleUser);
