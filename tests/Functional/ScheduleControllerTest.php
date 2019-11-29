@@ -62,6 +62,7 @@ class ScheduleControllerTest extends WebTestCase
         $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
         $this->assertArrayNotHasKey(self::WEEKEND_DATE, $scheduleUser);
+
     }
 
 
