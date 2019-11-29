@@ -46,15 +46,22 @@ class ScheduleControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->referenceRepository = $this->loadFixtures([UserFixtures::class, VacationFixtures::class, PartyFixtures::class])->getReferenceRepository();
+        var_dump($this->referenceRepository); dd(22);
+
         $this->user = $this->referenceRepository->getReference(UserFixtures::USER_REFERENCE);
+
         $this->partyRepository = $this->getContainer()->get(PartyRepository::class);
         $this->calendarApi = $this->getContainer()->get(GoogleCalendarApi::class);
     }
 
-    public function getLink(): string
+        /*
+    public function testScheduleController(): void
     {
-        return 'api/schedule?userId='.$this->user->getId().'&startDate='.self::START_DATE.'&endDate='.self::END_DATE.'';
+        $client = static::createClient();
+        $client->request('GET', $this->getLink());
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
     }
+    */
 
     public function testExcludeWeekendsFromSchedule(): void
     {
@@ -62,52 +69,22 @@ class ScheduleControllerTest extends WebTestCase
         $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
         $this->assertArrayNotHasKey(self::WEEKEND_DATE, $scheduleUser);
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-    public function testScheduleController(): void
-    {
-        $client = static::createClient();
-        $client->request('GET', $this->getLink());
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
-    }
-*/
-
-    public function testExcludeWeekendsFromSchedule1(): void
-    {
-        $client = static::createClient();
-        $client->request('GET', $this->getLink());
-        $jsonResponse = $client->getResponse()->getContent();
-        $this->assertStringNotContainsString(self::WEEKEND_DATE, $jsonResponse);
     }
 
     public function testExcludeHolidaysFromSchedule(): void
     {
-        $client = static::createClient();
-        $client->request('GET', $this->getLink());
-        $jsonResponse = $client->getResponse()->getContent();
-        $this->assertStringNotContainsString(self::HOLIDAY_DATE, $jsonResponse);
+        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
+        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+
+        $this->assertArrayNotHasKey(self::HOLIDAY_DATE, $scheduleUser);
     }
 
     public function testExcludeVacationsFromSchedule(): void
     {
-        $client = static::createClient();
-        $client->request('GET', $this->getLink());
-        $jsonResponse = $client->getResponse()->getContent();
-        $this->assertStringNotContainsString(self::VACATION_DATE, $jsonResponse);
+        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
+        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+
+        $this->assertArrayNotHasKey(self::VACATION_DATE, $scheduleUser);
     }
 
     /**
@@ -115,10 +92,10 @@ class ScheduleControllerTest extends WebTestCase
      */
     public function testExcludeCompanyPartiesFromSchedule(int $date): void
     {
-        $client = static::createClient();
-        $client->request('GET', $this->getLink());
-        $jsonResponse = $client->getResponse()->getContent();
-        $this->assertStringNotContainsString($date, $jsonResponse);
+        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
+        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+
+        $this->assertArrayNotHasKey($date, $scheduleUser);
     }
 
     public function partyDates(): array
@@ -135,10 +112,10 @@ class ScheduleControllerTest extends WebTestCase
      */
     public function testWorkingHoursWhenParty(string $time): void
     {
-        $client = static::createClient();
-        $client->request('GET', $this->getLink());
-        $jsonResponse = $client->getResponse()->getContent();
-        $this->assertStringContainsString($time, $jsonResponse);
+        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
+        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+
+        $this->assertArrayNotHasKey($time, $scheduleUser);
     }
 
     public function partyStartTime(): array
