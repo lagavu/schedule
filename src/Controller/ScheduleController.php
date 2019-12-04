@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\RemoteApi\GoogleCalendarApi;
 use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
-use App\Service\Schedule;
+use App\Service\ScheduleFactory;
 use Carbon\Carbon;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +15,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ScheduleController extends AbstractController
 {
-
     private $userRepository;
     private $partyRepository;
     private $calendarApi;
@@ -34,9 +33,9 @@ class ScheduleController extends AbstractController
     {
         return $this->render('schedule.html.twig', [
             'year' => date('Y'),
-            'users' => $this->userRepository->all(),
+            'users' => $this->userRepository->findAll(),
             'calendar' => $this->calendarApi->getHolidaysDateAndName(),
-            'parties' => $this->partyRepository->getParties(),
+            'parties' => $this->partyRepository->findAll(),
         ]);
     }
 
@@ -49,18 +48,18 @@ class ScheduleController extends AbstractController
        $userId = $request->query->get('userId');
        $startDate = Carbon::create($request->query->get('startDate'));
        $endDate = Carbon::create($request->query->get('endDate'));
-       $user = $this->userRepository->findUser($userId);
+       $user = $this->userRepository->findById($userId);
 
-       $schedule = new Schedule($user, $this->partyRepository, $this->calendarApi);
-       $scheduleUser = $schedule->getSchedule($startDate, $endDate);
+       $scheduler = new ScheduleFactory($this->partyRepository, $this->calendarApi);
+       $userSchedule = $scheduler->createUserSchedule($user, $startDate, $endDate);
 
-        return $this->render('schedule.html.twig', [
-            'json' => json_encode($scheduleUser, JSON_PRETTY_PRINT),
-            'user' => $user,
-            'vacations' => $user->getVacation()->toArray(),
-            'parties' => $this->partyRepository->getParties(),
-            'calendar' => $this->calendarApi->getHolidaysDateAndName(),
-            'year' => date('Y'),
-        ]);
+       return $this->render('schedule.html.twig', [
+           'json' => json_encode($userSchedule, JSON_PRETTY_PRINT),
+           'user' => $user,
+           'vacations' => $user->getVacation()->toArray(),
+           'parties' => $this->partyRepository->findAll(),
+           'calendar' => $this->calendarApi->getHolidaysDateAndName(),
+           'year' => date('Y'),
+       ]);
     }
 }

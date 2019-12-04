@@ -15,12 +15,12 @@ class Days
 
     public function remove(Days $days): Days
     {
-        return new Days(array_diff($this->getDays(), $days->getDays()));
+        return new static(array_diff(self::getDays(), $days->getDays()));
     }
 
     public function add(Days $days): Days
     {
-        return new Days(array_merge($days->getDays(), $this->getDays()));
+        return new static(array_merge($days->getDays(), self::getDays()));
     }
 
     public static function fromRange(\DateTimeInterface $startDate, \DateTimeInterface $endDate): Days
@@ -37,7 +37,7 @@ class Days
         return new self($datesRange);
     }
 
-    public function getDays(): array
+    private function getDays(): array
     {
         return $this->rangeDays;
     }

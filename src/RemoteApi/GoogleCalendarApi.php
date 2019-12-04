@@ -10,24 +10,17 @@ class GoogleCalendarApi
 
     public function getHolidays(): Days
     {
-        $datesHolidays = GoogleCalendarApi::getDatesHolidays();
-        $currentYearHolidays = array_filter($datesHolidays, function ($var) {
-            return substr($var, 0, 4) === date("Y");
-        });
-        $holidaysDays = new Days($currentYearHolidays);
-
-        return $holidaysDays;
+        return new Days(self::getDatesHolidays());
     }
 
     public function getHolidaysDateAndName(): array
     {
-        $countHolidays = GoogleCalendarApi::countHolidays();
-        $datesHolidays = GoogleCalendarApi::getDatesHolidays();
-        $nameHolidays = GoogleCalendarApi::getNameHolidays();
+        $countHolidays = self::countHolidays();
+        $datesHolidays = self::getDatesHolidays();
+        $nameHolidays = self::getNameHolidays();
         $holidaysDateAndName = [];
 
-        for ($i = 0; $i < $countHolidays; $i++)
-        {
+        for ($i = 0; $i < $countHolidays; $i++) {
             $holidaysDateAndName[] = [
                 "date" => $datesHolidays[$i],
                 "name_holiday" => $nameHolidays[$i]
@@ -37,42 +30,40 @@ class GoogleCalendarApi
         return $holidaysDateAndName;
     }
 
-    private static function googleCalendarApi(): array
+    private static function requestHolidaysFromApi(): array
     {
         return json_decode(file_get_contents(self::GOOGLE_CALENDAR_API), true);
     }
 
     private static function countHolidays(): int
     {
-        $countHolidays = GoogleCalendarApi::googleCalendarApi();
+        $getHolidays = self::requestHolidaysFromApi();
 
-        return count($countHolidays['items']);
+        return count($getHolidays['items']);
     }
 
     private static function getDatesHolidays(): array
     {
-        $itemsGoogleCalendarApi = GoogleCalendarApi::googleCalendarApi();
-        $countHolidays = GoogleCalendarApi::countHolidays();
+        $itemsHolidaysFromApi = self::requestHolidaysFromApi();
+        $countHolidays = self::countHolidays();
         $datesHolidays = [];
 
-        for ($i=0; $i < $countHolidays; $i++)
-        {
-            $datesHolidays[] = $itemsGoogleCalendarApi['items'][$i]['start']['date'];
-        };
+        for ($i = 0; $i < $countHolidays; $i++) {
+            $datesHolidays[] = $itemsHolidaysFromApi['items'][$i]['start']['date'];
+        }
 
         return $datesHolidays;
     }
 
     private static function getNameHolidays(): array
     {
-        $itemsGoogleCalendarApi = GoogleCalendarApi::googleCalendarApi();
-        $countHolidays = GoogleCalendarApi::countHolidays();
+        $itemsHolidaysFromApi = self::requestHolidaysFromApi();
+        $countHolidays = self::countHolidays();
         $nameHolidays = [];
 
-        for ($i=0; $i < $countHolidays; $i++)
-        {
-            $nameHolidays[] = $itemsGoogleCalendarApi['items'][$i]['summary'];
-        };
+        for ($i = 0; $i < $countHolidays; $i++) {
+            $nameHolidays[] = $itemsHolidaysFromApi['items'][$i]['summary'];
+        }
 
         return $nameHolidays;
     }

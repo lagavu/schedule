@@ -20,12 +20,12 @@ class Vacation
     /**
      * @ORM\Column(type="date")
      */
-    private $start_vacation;
+    private $startVacation;
 
     /**
      * @ORM\Column(type="date")
      */
-    private $end_vacation;
+    private $endVacation;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Model\User", inversedBy="vacation")
@@ -40,24 +40,24 @@ class Vacation
 
     public function getStartVacation(): ?\DateTimeInterface
     {
-        return $this->start_vacation;
+        return $this->startVacation;
     }
 
     public function setStartVacation(\DateTimeInterface $start_vacation): self
     {
-        $this->start_vacation = $start_vacation;
+        $this->startVacation = $start_vacation;
 
         return $this;
     }
 
     public function getEndVacation(): ?\DateTimeInterface
     {
-        return $this->end_vacation;
+        return $this->endVacation;
     }
 
     public function setEndVacation(\DateTimeInterface $end_vacation): self
     {
-        $this->end_vacation = $end_vacation;
+        $this->endVacation = $end_vacation;
 
         return $this;
     }

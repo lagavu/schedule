@@ -14,9 +14,9 @@ class PartyRepository
         $this->repository = $entityManager->getRepository(Party::class);
     }
 
-    public function getParties(): array
+    public function findAll(): array
     {
-        return $this->repository->findBy([], ['start_day_party' => 'ASC']);
+        return $this->repository->findBy([], ['startDayParty' => 'ASC']);
 
     }
 }

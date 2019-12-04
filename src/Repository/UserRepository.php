@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Model\User;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserRepository
@@ -15,12 +14,12 @@ class UserRepository
         $this->repository = $entityManager->getRepository(User::class);
     }
 
-    public function findUser(int $id): ?User
+    public function findById(int $id): ?User
     {
         return $this->repository->findOneBy(['id' => $id]);
     }
 
-    public function all(): array
+    public function findAll(): array
     {
         return $this->repository->findAll();
     }

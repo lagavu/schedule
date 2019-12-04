@@ -5,7 +5,7 @@ namespace App\Controller\Api;
 use App\RemoteApi\GoogleCalendarApi;
 use App\Repository\PartyRepository;
 use App\Repository\UserRepository;
-use App\Service\Schedule;
+use App\Service\ScheduleFactory;
 use App\Service\ScheduleQuery;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,19 +40,15 @@ class ScheduleController extends AbstractController
 
         $errors = $validator->validate($scheduleQuery);
 
-        if (count($errors) > 0) {
-            $errorsString = (string) $errors;
-
-            $response = $this->json($errorsString);
-            $response->setStatusCode(422);
-
-            return $response;
+        if (count($errors)) {
+            return $this->json((string) $errors, 422);
         }
 
-        $user = $this->userRepository->findUser($scheduleQuery->userId);
-        $schedule = new Schedule($user, $this->partyRepository, $this->calendarApi);
-        $scheduleUser = $schedule->getSchedule(new \DateTime($scheduleQuery->startDate), new \DateTime($scheduleQuery->endDate));
+        $user = $this->userRepository->findById($scheduleQuery->userId);
 
-        return $this->json($scheduleUser);
+        $scheduler = new ScheduleFactory($this->partyRepository, $this->calendarApi);
+        $userSchedule = $scheduler->createUserSchedule($user, new \DateTime($scheduleQuery->startDate), new \DateTime($scheduleQuery->endDate));
+
+        return $this->json($userSchedule);
     }
 }

@@ -27,22 +27,22 @@ class User
     /**
      * @ORM\Column(type="time")
      */
-    private $start_morning_work_hours;
+    private $startMorningWorkHours;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $end_morning_work_hours;
+    private $endMorningWorkHours;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $start_afternoon_work_hours;
+    private $startAfternoonWorkHours;
 
     /**
      * @ORM\Column(type="time")
      */
-    private $end_afternoon_work_hours;
+    private $endAfternoonWorkHours;
 
     public function __construct()
     {
@@ -85,67 +85,43 @@ class User
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getStartMorningWorkHours()
+    public function getStartMorningWorkHours(): \DateTime
     {
-        return $this->start_morning_work_hours;
+        return $this->startMorningWorkHours;
     }
 
-    /**
-     * @param mixed $start_morning_work_hours
-     */
-    public function setStartMorningWorkHours($start_morning_work_hours): void
+    public function setStartMorningWorkHours($startMorningWorkHours): void
     {
-        $this->start_morning_work_hours = $start_morning_work_hours;
+        $this->startMorningWorkHours = $startMorningWorkHours;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEndMorningWorkHours()
+    public function getEndMorningWorkHours(): \DateTime
     {
-        return $this->end_morning_work_hours;
+        return $this->endMorningWorkHours;
     }
 
-    /**
-     * @param mixed $end_morning_work_hours
-     */
-    public function setEndMorningWorkHours($end_morning_work_hours): void
+    public function setEndMorningWorkHours($endMorningWorkHours): void
     {
-        $this->end_morning_work_hours = $end_morning_work_hours;
+        $this->endMorningWorkHours = $endMorningWorkHours;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getStartAfternoonWorkHours()
+    public function getStartAfternoonWorkHours(): \DateTime
     {
-        return $this->start_afternoon_work_hours;
+        return $this->startAfternoonWorkHours;
     }
 
-    /**
-     * @param mixed $start_afternoon_work_hours
-     */
-    public function setStartAfternoonWorkHours($start_afternoon_work_hours): void
+    public function setStartAfternoonWorkHours($startAfternoonWorkHours): void
     {
-        $this->start_afternoon_work_hours = $start_afternoon_work_hours;
+        $this->startAfternoonWorkHours = $startAfternoonWorkHours;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEndAfternoonWorkHours()
+    public function getEndAfternoonWorkHours(): \DateTime
     {
-        return $this->end_afternoon_work_hours;
+        return $this->endAfternoonWorkHours;
     }
 
-    /**
-     * @param mixed $end_afternoon_work_hours
-     */
-    public function setEndAfternoonWorkHours($end_afternoon_work_hours): void
+    public function setEndAfternoonWorkHours($endAfternoonWorkHours): void
     {
-        $this->end_afternoon_work_hours = $end_afternoon_work_hours;
+        $this->endAfternoonWorkHours = $endAfternoonWorkHours;
     }
 }

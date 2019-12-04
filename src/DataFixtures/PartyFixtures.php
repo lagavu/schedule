@@ -20,13 +20,13 @@ class PartyFixtures extends Fixture
         $party = new Party();
         $party->setName('ДР Компании');
         $party->setStartDayParty(new \DateTime('2019-01-21 16:00:00'));
-        $party->setEndDayParty(new \DateTime('2019-01-23'));
+        $party->setEndDayParty(new \DateTime('2019-01-23 12:00:00'));
         $manager->persist($party);
 
         $party = new Party();
         $party->setName('Корпоратив');
         $party->setStartDayParty(new \DateTime('2019-01-25 12:00:00'));
-        $party->setEndDayParty(new \DateTime('2019-01-27'));
+        $party->setEndDayParty(new \DateTime('2019-01-26 17:00:00'));
         $manager->persist($party);
 
         $manager->flush();

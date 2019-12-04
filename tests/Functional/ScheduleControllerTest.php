@@ -9,7 +9,8 @@ use App\Model\User;
 use App\RemoteApi\GoogleCalendarApi;
 use App\Repository\PartyRepository;
 use App\Service\Days;
-use App\Service\Schedule;
+use App\Service\ScheduleFactory;
+use Exception;
 use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -22,8 +23,6 @@ class ScheduleControllerTest extends WebTestCase
     private const WEEKEND_DATE = '2019-01-05';
     private const HOLIDAY_DATE = '2019-01-01';
     private const VACATION_DATE = '2019-01-16';
-
-    private $referenceRepository;
 
     /**
      * @var User
@@ -42,29 +41,29 @@ class ScheduleControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->referenceRepository = $this->loadFixtures([UserFixtures::class, VacationFixtures::class, PartyFixtures::class])->getReferenceRepository();
-        $this->user = $this->referenceRepository->getReference(UserFixtures::USER_REFERENCE);
+        $referenceRepository = $this->loadFixtures([UserFixtures::class, VacationFixtures::class, PartyFixtures::class])->getReferenceRepository();
+        $this->user = $referenceRepository->getReference(UserFixtures::USER_REFERENCE);
         $this->partyRepository = $this->getContainer()->get(PartyRepository::class);
-        $this->calendarApi = $this->stubHolidays();
+        $this->calendarApi = $this->createGoogleCalendarApiClientWithHolidays();
     }
 
     public function testExcludeWeekendsFromSchedule(): void
     {
-        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
-        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+        $scheduler = new ScheduleFactory($this->partyRepository, $this->calendarApi);
+        $userSchedule = $scheduler->createUserSchedule($this->user, new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
-        $this->assertArrayNotHasKey(self::WEEKEND_DATE, $scheduleUser);
+        $this->assertArrayNotHasKey(self::WEEKEND_DATE, $userSchedule);
     }
 
     public function testExcludeHolidaysFromSchedule(): void
     {
-        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
-        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+        $scheduler = new ScheduleFactory($this->partyRepository, $this->calendarApi);
+        $userSchedule = $scheduler->createUserSchedule($this->user, new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
-        $this->assertArrayNotHasKey(self::HOLIDAY_DATE, $scheduleUser);
+        $this->assertArrayNotHasKey(self::HOLIDAY_DATE, $userSchedule);
     }
 
-    public function stubHolidays()
+    public function createGoogleCalendarApiClientWithHolidays(): object
     {
         $holidays = new Days([
             '2019-01-01',
@@ -94,29 +93,30 @@ class ScheduleControllerTest extends WebTestCase
 
     public function testExcludeVacationsFromSchedule(): void
     {
-        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
-        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+        $scheduler = new ScheduleFactory($this->partyRepository, $this->calendarApi);
+        $userSchedule = $scheduler->createUserSchedule($this->user, new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
-        $this->assertArrayNotHasKey(self::VACATION_DATE, $scheduleUser);
+        $this->assertArrayNotHasKey(self::VACATION_DATE, $userSchedule);
     }
 
     /**
      * @dataProvider partyDates
+     * @throws Exception
      */
-    public function testExcludeCompanyPartiesFromSchedule(int $date): void
+    public function testExcludeCompanyPartiesFromSchedule(string $date): void
     {
-        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
-        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+        $scheduler = new ScheduleFactory($this->partyRepository, $this->calendarApi);
+        $userSchedule = $scheduler->createUserSchedule($this->user, new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
-        $this->assertArrayNotHasKey($date, $scheduleUser);
+        $this->assertArrayNotHasKey($date, $userSchedule);
     }
 
     public function partyDates(): array
     {
         return [
-            [2018-12-04],
-            [2019-01-22],
-            [2019-01-26],
+            ['2018-12-04'],
+            ['2019-01-22'],
+            ['2019-01-26'],
         ];
     }
 
@@ -125,10 +125,10 @@ class ScheduleControllerTest extends WebTestCase
      */
     public function testWorkingHoursWhenParty(string $time): void
     {
-        $schedule = new Schedule($this->user, $this->partyRepository, $this->calendarApi);
-        $scheduleUser = $schedule->getSchedule(new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
+        $schedule = new ScheduleFactory($this->partyRepository, $this->calendarApi);
+        $userSchedule = $schedule->createUserSchedule($this->user, new \DateTime(self::START_DATE), new \DateTime(self::END_DATE));
 
-        $this->assertArrayNotHasKey($time, $scheduleUser);
+        $this->assertArrayNotHasKey($time, $userSchedule);
     }
 
     public function partyStartTime(): array

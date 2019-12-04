@@ -13,13 +13,11 @@ class ScheduleControllerValidationTest extends WebTestCase
     private const VALID_START_DATE = '2019-01-01';
     private const VALID_END_DATE = '2019-01-31';
 
-    private $referenceRepository;
     private $user;
 
     protected function setUp(): void
     {
-        $this->referenceRepository = $this->loadFixtures([UserFixtures::class])->getReferenceRepository();
-        $this->user = $this->referenceRepository->getReference(UserFixtures::USER_REFERENCE);
+        $this->user = $this->loadFixtures([UserFixtures::class])->getReferenceRepository()->getReference(UserFixtures::USER_REFERENCE);
     }
 
     public function getApiLink(string $startDate, string $endDate): string
